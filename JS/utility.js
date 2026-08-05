@@ -55,6 +55,8 @@ const COLORS = {
 };
 
 const readScores = function (p1Name, p2Name) {
+    p1Name = p1Name.toLowerCase();
+    p2Name = p2Name.toLowerCase();
     const results = localStorage.getItem(`${BUCKSHOTROULETTE}-${p1Name}-${p2Name}`) || localStorage.getItem(`${BUCKSHOTROULETTE}-${p2Name}-${p1Name}`);
 
     if (!results)
@@ -70,8 +72,11 @@ const readScores = function (p1Name, p2Name) {
 
 };
 
-const writeScores = function (p1Name, p2Name, scores) {
+const writeScores = function (p1Name, p2Name, score1, score2) {
+    p1Name = p1Name.toLowerCase();
+    p2Name = p2Name.toLowerCase();
     const curResults = readScores(p1Name, p2Name);
+    const date = new Date().toLocaleDateString("en-GB"); // dd/mm/yyyy
 
     if (curResults === -1) {
         localStorage.setItem(`${BUCKSHOTROULETTE}-${p1Name}-${p2Name}`, JSON.stringify({
@@ -79,17 +84,16 @@ const writeScores = function (p1Name, p2Name, scores) {
                 p1: p1Name,
                 p2: p2Name
             },
-            scores: [...scores]
+            scores: [[score1, score2, date]]
         }));
     }
     else {
         if (curResults.players.p1 === p2Name) {
-            curResults.scores.push(...scores.map(score => [score[1], score[0]]));
-
+            curResults.scores.push([score2, score1, date]);
             localStorage.setItem(`${BUCKSHOTROULETTE}-${p2Name}-${p1Name}`, JSON.stringify(curResults));
         }
         else {
-            curResults.scores.push(...scores);
+            curResults.scores.push([score1, score2, date]);
             localStorage.setItem(`${BUCKSHOTROULETTE}-${p1Name}-${p2Name}`, JSON.stringify(curResults));
         }
     }
@@ -97,6 +101,9 @@ const writeScores = function (p1Name, p2Name, scores) {
 
 
 const clearHistory = function (p1Name, p2Name) {
+    p1Name = p1Name.toLowerCase();
+    p2Name = p2Name.toLowerCase();
+
     localStorage.removeItem(`${BUCKSHOTROULETTE}-${p1Name}-${p2Name}`);
     localStorage.removeItem(`${BUCKSHOTROULETTE}-${p2Name}-${p1Name}`);
 };
@@ -156,5 +163,7 @@ const getPermutations = function (array) {
 const getPermutation = function (combination) {
     return getRandom(getPermutations(combination));
 };
+
+
 
 export { COMBINATIONS, ITEMS, COLORS, readScores, writeScores, clearHistory, readSettings, writeSettings, getRandom, getPermutation };

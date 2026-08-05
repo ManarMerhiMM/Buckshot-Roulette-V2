@@ -1,0 +1,29 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="About">
+    <defs>
+        <radialGradient id="face" cx="35%" cy="30%" r="75%">
+            <stop offset="0%"  stop-color="#221c12"/>
+            <stop offset="100%" stop-color="#0f0d0a"/>
+        </radialGradient>
+        <linearGradient id="ring" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"   stop-color="#e6c065"/>
+            <stop offset="55%"  stop-color="#c9962c"/>
+            <stop offset="100%" stop-color="#7a5f22"/>
+        </linearGradient>
+    </defs>
+
+    <!-- outer brass rim -->
+    <circle cx="32" cy="32" r="30" fill="url(#ring)"/>
+
+    <!-- dark face -->
+    <circle cx="32" cy="32" r="25" fill="url(#face)"/>
+
+    <!-- inner rivet ring -->
+    <circle cx="32" cy="32" r="25" fill="none" stroke="#050403" stroke-width="1.5" opacity="0.6"/>
+
+    <!-- "i" glyph, drawn as shapes so it renders crisp at small sizes -->
+    <circle cx="32" cy="19" r="4.2" fill="#e9b32b"/>
+    <rect x="26.5" y="27" width="11" height="24" rx="5.5" fill="#e9b32b"/>
+
+    <!-- primer accent dot, echoes the nav shell detail -->
+    <circle cx="47" cy="47" r="3.4" fill="#be5500"/>
+</svg>

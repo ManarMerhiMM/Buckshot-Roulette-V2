@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - Buckshot Roulette</title>
+    <link rel="icon" type="image/svg+xml" href="Assets/Icons/history.svg">
+    <link rel="stylesheet" href="CSS/styles.css">
+    <link rel="stylesheet" href="CSS/history.css">
+    <script type="module" src="JS/history.js"></script>
+</head>
+
+<body>
+
+    <header class="page-header">
+        <a href="index.html" class="back-link">‹ Back to menu</a>
+        <h1 class="page-title">Match History</h1>
+        <p class="tagline">Every session, on record.</p>
+    </header>
+
+    <main class="content">
+
+        <form id="historyForm">
+            <p id="ErrorMessage"></p>
+
+            <label for="p1">Player 1:</label>
+            <input type="text" id="p1" name="p1">
+
+            <label for="p2">Player 2:</label>
+            <input type="text" id="p2" name="p2">
+
+            <button type="submit">Get History</button>
+            <button type="button" id="clearHistoryBtn">Clear History</button>
+        </form>
+
+        <table id="matchHistory">
+            <thead>
+                <tr>
+                    <th id="p1Header">Player 1</th>
+                    <th id="p2Header">Player 2</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="matchHistoryBody"></tbody>
+        </table>
+
+    </main>
+
+</body>
+
+</html>

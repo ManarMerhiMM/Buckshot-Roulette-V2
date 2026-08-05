@@ -1,0 +1,189 @@
+body {
+    justify-content: flex-start;
+    padding: 72px 24px 96px;
+    gap: 0;
+}
+
+/* ---------- Page header ---------- */
+
+.page-header {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 56px;
+}
+
+.back-link {
+    align-self: flex-start;
+    margin-left: max(4px, calc(50% - 340px));
+    margin-bottom: 28px;
+
+    color: #e7b700;
+    text-decoration: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 200ms ease;
+}
+
+.back-link:hover,
+.back-link:focus-visible {
+    color: var(--blood-hot);
+}
+
+.page-title {
+    font-family: 'Black Ops One', sans-serif;
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--bone);
+    text-shadow:
+        0 0 18px rgba(226, 66, 42, 0.3),
+        3px 3px 0 rgba(0, 0, 0, 0.6);
+}
+
+.page-header .tagline {
+    margin-top: 12px;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--brass);
+}
+
+
+.tagline{
+    font-family: 'Black Ops One', sans-serif;
+}
+/* ---------- Content sections ---------- */
+
+.content {
+    width: min(680px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+}
+
+.content-section h2 {
+    font-family: 'Black Ops One', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #2a2318;
+}
+
+.content-section p {
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: #c9c4b5;
+}
+
+.content-section p+p {
+    margin-top: 14px;
+}
+
+.plain-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.plain-list li {
+    position: relative;
+    padding-left: 22px;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: #c9c4b5;
+}
+
+.plain-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--brass-dim);
+}
+
+.plain-list strong {
+    color: var(--brass);
+    font-weight: 700;
+}
+
+/* ---------- Item grid ---------- */
+
+.item-grid {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.item-card {
+    padding: 18px 20px;
+    background: linear-gradient(180deg, var(--panel), #0f0d0a);
+    border: 1px solid #2a2318;
+    border-left: 3px solid var(--brass-dim);
+    border-radius: 2px 4px 4px 2px;
+    transition: border-color 200ms ease, transform 160ms ease;
+}
+
+.item-card:hover {
+    border-left-color: var(--blood-hot);
+    transform: translateX(2px);
+}
+
+.item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--blood);
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.item-card h3 {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #d8d3c4;
+    margin-bottom: 6px;
+}
+
+.item-card p {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: #a39d8e;
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 600px) {
+    body {
+        padding: 48px 18px 72px;
+    }
+
+    .back-link {
+        margin-left: 0;
+    }
+
+    .item-grid {
+        grid-template-columns: 1fr;
+    }
+}

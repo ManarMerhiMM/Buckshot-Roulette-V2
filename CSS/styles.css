@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Black+Ops+One&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+    --void: #0b0a08;
+    --panel: #17140f;
+    --brass: #f8ab03;
+    --brass-dim: #5e4711;
+    --blood: #9c1c1c;
+    --blood-hot: #be5500;
+    --bone: #e9b32b;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    background: var(--void);
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 64px;
+
+    background:
+        radial-gradient(ellipse at 50% 30%, rgba(201, 150, 44, 0.06), transparent 60%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 1px, transparent 1px, transparent 3px),
+        var(--void);
+
+    color: var(--bone);
+    font-family: 'Space Mono', monospace;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* film-grain overlay */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    z-index: 999;
+}
+
+.hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 340px;
+    height: 340px;
+    transform: translate(-50%, -55%);
+    border-radius: 50%;
+    border: 2px solid var(--brass-dim);
+    box-shadow:
+        inset 0 0 60px rgba(0, 0, 0, 0.8),
+        0 0 40px rgba(201, 150, 44, 0.08);
+    background:
+        repeating-conic-gradient(var(--panel) 0deg 55deg,
+            #0f0d0a 55deg 60deg);
+    animation: cylinder-turn 40s linear infinite;
+    z-index: -1;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 340px;
+    height: 340px;
+    transform: translate(-50%, -55%) rotate(15deg);
+    border-radius: 50%;
+    background-image:
+        radial-gradient(circle 7px at 50% 8%, var(--blood-hot) 96%, transparent 100%),
+        radial-gradient(circle 7px at 85% 27%, var(--brass) 96%, transparent 100%),
+        radial-gradient(circle 7px at 85% 73%, var(--brass) 96%, transparent 100%),
+        radial-gradient(circle 7px at 50% 92%, var(--brass) 96%, transparent 100%),
+        radial-gradient(circle 7px at 15% 73%, var(--brass) 96%, transparent 100%),
+        radial-gradient(circle 7px at 15% 27%, var(--brass) 96%, transparent 100%);
+    filter: drop-shadow(0 0 6px rgba(226, 66, 42, 0.5));
+    animation: cylinder-turn 40s linear infinite;
+    z-index: -1;
+}
+
+@keyframes cylinder-turn {
+    to {
+        transform: translate(-50%, -55%) rotate(375deg);
+    }
+}
+
+h1 {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(3rem, 9vw, 6.5rem);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    line-height: 0.95;
+    color: var(--bone);
+    text-shadow:
+        0 0 18px rgba(226, 66, 42, 0.35),
+        3px 3px 0 rgba(0, 0, 0, 0.6);
+}
+
+@keyframes flicker {
+
+    0%,
+    92%,
+    100% {
+        opacity: 1;
+        text-shadow: 0 0 18px rgba(226, 66, 42, 0.35), 3px 3px 0 rgba(0, 0, 0, 0.6);
+    }
+
+    93% {
+        opacity: 0.4;
+        text-shadow: none;
+    }
+
+    94% {
+        opacity: 1;
+    }
+
+    95% {
+        opacity: 0.55;
+        text-shadow: none;
+    }
+
+    96% {
+        opacity: 1;
+    }
+}
+
+.hero .tagline {
+    margin-top: 14px;
+    font-size: 0.85rem;
+    font-family: 'Black Ops One', sans-serif;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--brass);
+}
+
+/* ============================================================
+   NAV — four shells racked and ready. Each link is loaded like
+   a round: brass base, primer dot, a hair-trigger hover state.
+   ============================================================ */
+
+nav ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 22px;
+}
+
+
+nav a {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 168px;
+    padding: 28px 16px 20px;
+
+    background: linear-gradient(180deg, var(--panel), #0f0d0a);
+    border: 1px solid #2a2318;
+    border-top: 3px solid var(--brass-dim);
+    border-radius: 4px 4px 2px 2px;
+
+    color: var(--bone);
+    text-decoration: none;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+
+    box-shadow: 0 12px 24px -14px rgba(0, 0, 0, 0.9);
+    transition: border-color 220ms ease, transform 160ms ease, box-shadow 220ms ease, background 220ms ease;
+}
+
+
+
+nav a::after {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--brass-dim);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.5) inset;
+    transition: background 220ms ease, box-shadow 220ms ease;
+}
+
+nav a:hover,
+nav a:focus-visible {
+    border-top-color: var(--blood-hot);
+    background: linear-gradient(180deg, #1e1712, #100c08);
+    transform: translateY(-6px);
+    box-shadow: 0 18px 30px -14px rgba(0, 0, 0, 0.95), 0 0 24px -4px rgba(226, 66, 42, 0.35);
+    outline: none;
+}
+
+nav a:hover::after,
+nav a:focus-visible::after {
+    background: var(--blood-hot);
+    box-shadow: 0 0 10px 2px rgba(226, 66, 42, 0.8);
+}
+
+nav a:active {
+    transform: translateY(-2px) scale(0.97);
+}
+
+.shotgun-art {
+    width: min(520px, 80vw);
+    height: auto;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 0 24px rgba(0, 0, 0, 0.6));
+    transform-origin: 50% 85%;
+    animation: shotgun-rock 5.5s ease-in-out infinite;
+}
+
+@keyframes shotgun-rock {
+
+    0%,
+    100% {
+        transform: rotate(-1.4deg) translateY(0);
+    }
+
+    50% {
+        transform: rotate(1.4deg) translateY(-3px);
+    }
+}
+
+/* ============================================================
+   Motion & access
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+
+    .hero::before,
+    .hero::after,
+    .shotgun-art {
+        animation: none !important;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        gap: 44px;
+        padding: 0 20px;
+    }
+
+    .hero::before,
+    .hero::after {
+        width: 260px;
+        height: 260px;
+    }
+
+    .hero .tagline{
+        font-size: 0.65rem;
+    }
+    nav a {
+        width: 140px;
+        font-size: 0.7rem;
+    }
+}

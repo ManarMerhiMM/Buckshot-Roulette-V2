@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About — Buckshot Roulette</title>
+    <link rel="icon" type="image/svg+xml" href="Assets/Icons/about.svg">
+    <link rel="stylesheet" href="CSS/styles.css">
+    <link rel="stylesheet" href="CSS/about.css">
+</head>
+
+<body>
+
+    <header class="page-header">
+        <a href="index.html" class="back-link">‹ Back to menu</a>
+        <h1 class="page-title">About</h1>
+        <p class="tagline">Everything You Need to Know</p>
+    </header>
+
+    <main class="content">
+
+        <section class="content-section">
+            <h2>Overview</h2>
+            <p>
+                Two players sit down with one shotgun, a chamber of live and blank
+                shells in an order neither of them knows, and a handful of items.
+                Each round is a straight test of probability, nerve, and how well you can bluff someone across the
+                table.
+            </p>
+            <p>
+                This started as a terminal game — a Python console app played
+                entirely in text. This is the same game, rebuilt for the browser:
+                same mechanics, same odds, no install required.
+            </p>
+        </section>
+
+        <section class="content-section">
+            <h2>Core Gameplay</h2>
+            <ul class="plain-list">
+                <li>A randomized sequence of live and blank shells loads into the chamber each round</li>
+                <li>On your turn, shoot yourself or shoot your opponent</li>
+                <li>Each player tracks health across the round</li>
+                <li>Play multiple rounds — scores carry across the match</li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h2>Items</h2>
+            <p>Between shells, you might draw an item. Used well, any of these can turn a round around.</p>
+
+            <div class="item-grid">
+                <div class="item-card">
+                    <span class="item-icon" aria-hidden="true">🪚</span>
+                    <h3>Saw</h3>
+                    <p>Doubles the damage of your next shot.</p>
+                </div>
+                <div class="item-card">
+                    <span class="item-icon" aria-hidden="true">🔍</span>
+                    <h3>Magnifying Lens</h3>
+                    <p>Reveals whether the next shell is live or blank.</p>
+                </div>
+                <div class="item-card">
+                    <span class="item-icon" aria-hidden="true">📱</span>
+                    <h3>Phone</h3>
+                    <p>Reveals a random shell somewhere further down the chamber.</p>
+                </div>
+                <div class="item-card">
+                    <span class="item-icon" aria-hidden="true">🍺</span>
+                    <h3>Beer</h3>
+                    <p>Racks the next shell out of the chamber, unfired.</p>
+                </div>
+                <div class="item-card">
+                    <span class="item-icon" aria-hidden="true">🚬</span>
+                    <h3>Smoke</h3>
+                    <p>Heals a small amount of health.</p>
+                </div>
+                <div class="item-card">
+                    <span class="item-icon" aria-hidden="true">💊</span>
+                    <h3>Deadly Pill</h3>
+                    <p>A gamble — 60% chance to lose 1 health, 40% chance to gain 2.</p>
+                </div>
+                <div class="item-card">
+                    <span class="item-icon" aria-hidden="true">⛓️</span>
+                    <h3>Chains</h3>
+                    <p>Restricts your opponent's next turn.</p>
+                </div>
+                <div class="item-card">
+                    <span class="item-icon" aria-hidden="true">🔄</span>
+                    <h3>Inverter</h3>
+                    <p>Flips the next shell from live to blank, or blank to live.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Settings &amp; Match History</h2>
+            <p>
+                Health range, item counts, and player colors are all configurable
+                before a match. Every result is saved automatically — no accounts,
+                no files to manage — so you can look back at your record against
+                any opponent, or clear it and start fresh, whenever you like.
+            </p>
+        </section>
+
+        <section class="content-section">
+            <h2>Game Mechanics</h2>
+            <ul class="plain-list">
+                <li><strong>Live shell (💥)</strong> — causes damage on a hit</li>
+                <li><strong>Blank shell (🎭)</strong> — no damage; shooting yourself with a blank keeps your turn</li>
+                <li>The shell order is hidden, but items can partially reveal it</li>
+                <li>Every item exists to shift the odds, disrupt your opponent's plan, or buy you information</li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h2>Notes</h2>
+            <ul class="plain-list">
+                <li>Local 1v1 — both players share the same screen</li>
+                <li>No networking and no AI opponent, by design</li>
+            </ul>
+        </section>
+
+    </main>
+
+</body>
+
+</html>
