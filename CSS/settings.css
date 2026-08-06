@@ -1,0 +1,235 @@
+/* ============================================================
+   SETTINGS PAGE — extends styles.css
+   ============================================================ */
+
+body {
+    justify-content: flex-start;
+    padding: 72px 24px 96px;
+    gap: 0;
+}
+
+.page-header {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.back-link {
+    align-self: flex-start;
+    margin-left: max(4px, calc(50% - 340px));
+    margin-bottom: 28px;
+
+    color: #e7b700;
+    text-decoration: none;
+
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    transition: color 200ms ease;
+}
+
+.back-link:hover,
+.back-link:focus-visible {
+    color: var(--blood-hot);
+}
+
+.page-title {
+    font-family: 'Black Ops One', sans-serif;
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+
+    color: var(--bone);
+
+    text-shadow:
+        0 0 18px rgba(226, 66, 42, 0.3),
+        3px 3px 0 rgba(0, 0, 0, 0.6);
+}
+
+.page-header .tagline {
+    margin-top: 12px;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--brass);
+}
+
+.content {
+    width: min(680px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.settings-section {
+    padding: 24px;
+
+    background: linear-gradient(180deg, var(--panel), #0f0d0a);
+
+    border: 1px solid #2a2318;
+    border-top: 3px solid var(--brass-dim);
+    border-radius: 4px 4px 2px 2px;
+}
+
+.settings-section h2 {
+    margin-bottom: 22px;
+
+    color: var(--brass);
+
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 14px 0;
+
+    border-bottom: 1px solid #211d15;
+}
+
+.setting-row:last-child {
+    border-bottom: none;
+}
+
+.setting-row label {
+    color: #c9c4b5;
+
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.setting-row input[type="number"] {
+    width: 90px;
+    padding: 8px;
+
+    background: #0d0b08;
+
+    border: 1px solid #2a2318;
+
+    color: var(--bone);
+
+    font-family: 'Space Mono', monospace;
+    text-align: center;
+}
+
+.setting-row input[type="number"]:focus {
+    outline: none;
+    border-color: var(--brass);
+}
+
+.setting-row input[type="color"] {
+    width: 55px;
+    height: 35px;
+
+    background: #0d0b08;
+
+    border: 1px solid #2a2318;
+
+    cursor: pointer;
+}
+
+.settings-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.settings-actions button {
+    flex: 1;
+
+    padding: 12px 20px;
+
+    background: linear-gradient(180deg, var(--panel), #0f0d0a);
+
+    border: 1px solid #2a2318;
+    border-top: 3px solid var(--brass-dim);
+    border-radius: 4px 4px 2px 2px;
+
+    color: var(--bone);
+
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    transition:
+        border-color 220ms ease,
+        transform 160ms ease,
+        box-shadow 220ms ease;
+}
+
+.settings-actions button:hover,
+.settings-actions button:focus-visible {
+    border-top-color: var(--brass);
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 10px 20px -12px rgba(0, 0, 0, 0.9);
+
+    outline: none;
+}
+
+.settings-actions button:active {
+    transform: scale(0.95);
+}
+
+#resetSettingsBtn {
+    border-top-color: var(--blood);
+}
+
+#resetSettingsBtn:hover,
+#resetSettingsBtn:focus-visible {
+    border-top-color: var(--blood-hot);
+
+    box-shadow:
+        0 10px 20px -12px rgba(0, 0, 0, 0.9),
+        0 0 18px -6px rgba(226, 66, 42, 0.4);
+}
+
+#errorMessage {
+    color: var(--blood-hot);
+
+    font-family: 'Space Mono', monospace;
+}
+
+@media (max-width: 600px) {
+
+    body {
+        padding: 48px 18px 72px;
+    }
+
+    .back-link {
+        margin-left: 0;
+    }
+
+    .setting-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .setting-row input {
+        width: 100%;
+    }
+
+    .settings-actions {
+        flex-direction: column;
+    }
+}

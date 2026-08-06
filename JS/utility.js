@@ -35,25 +35,6 @@ const ITEMS = [
     "inverter"
 ];
 
-const COLORS = {
-    RED: "#ff0000",
-    GREEN: "#00ff00",
-    YELLOW: "#ffff00",
-    BLUE: "#0000ff",
-    MAGENTA: "#ff00ff",
-    CYAN: "#00ffff",
-    WHITE: "#ffffff",
-    BLACK: "#000000",
-    LIGHT_BLACK: "#555555",
-    LIGHT_RED: "#ff5555",
-    LIGHT_GREEN: "#55ff55",
-    LIGHT_YELLOW: "#ffff55",
-    LIGHT_BLUE: "#5555ff",
-    LIGHT_MAGENTA: "#ff55ff",
-    LIGHT_CYAN: "#55ffff",
-    LIGHT_GREY: "#d1d1d1"
-};
-
 const DEFAULTSTATS = {
     totalMatches: 0,
     totalRounds: 0,
@@ -80,7 +61,7 @@ const DEFAULTSETTINGS = {
     minItems: 0,
     maxItems: 2,
     p1Color: "#ff0000",
-    p2Color: "#00ffff"
+    p2Color: "#0a64ca"
 };
 
 
@@ -250,4 +231,4 @@ const getPermutation = function (combination) {
 
 
 
-export { COMBINATIONS, ITEMS, COLORS, getMatch, writeScores, clearHistory, readSettings, writeSettings, resetSettings, readStats, writeStats, resetStats, getRandom, getPermutation };
+export { COMBINATIONS, ITEMS, getMatch, writeScores, clearHistory, readSettings, writeSettings, resetSettings, readStats, writeStats, resetStats, getRandom, getPermutation };

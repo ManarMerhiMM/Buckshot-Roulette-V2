@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Settings - Buckshot Roulette</title>
+
+    <link rel="icon" type="image/png" href="Assets/Icons/settings.png">
+
+    <link rel="stylesheet" href="CSS/styles.css">
+    <link rel="stylesheet" href="CSS/settings.css">
+
+    <script type="module" src="JS/settings.js"></script>
+</head>
+
+<body>
+
+    <header class="page-header">
+        <a href="index.html" class="back-link">‹ Back to menu</a>
+
+        <h1 class="page-title">Settings</h1>
+
+        <p class="tagline">Tune the chamber.</p>
+    </header>
+
+
+    <main class="content">
+        <p id="errorMessage"></p>
+        <section class="settings-section">
+            <h2>Game Rules</h2>
+
+            <div class="setting-row">
+                <label for="minHealth">
+                    Minimum Health
+                </label>
+                <input type="number" id="minHealth" min="1">
+            </div>
+
+            <div class="setting-row">
+
+                <label for="maxHealth">
+                    Maximum Health
+                </label>
+
+                <input type="number" id="maxHealth" min="1">
+            </div>
+
+            <div class="setting-row">
+
+                <label for="minItems">
+                    Minimum Items
+                </label>
+                <input type="number" id="minItems" min="0">
+            </div>
+
+            <div class="setting-row">
+                <label for="maxItems">
+                    Maximum Items
+                </label>
+                <input type="number" id="maxItems" min="0">
+            </div>
+
+
+        </section>
+
+        <section class="settings-section">
+
+            <h2>Player Colors</h2>
+            <div class="setting-row">
+
+                <label for="p1Color">
+                    Player 1 Color
+                </label>
+
+                <input type="color" id="p1Color">
+            </div>
+
+
+            <div class="setting-row">
+
+                <label for="p2Color">
+                    Player 2 Color
+                </label>
+                <input type="color" id="p2Color">
+            </div>
+        </section>
+
+        <section class="settings-actions">
+            <button id="saveSettingsBtn">
+                Save Settings
+            </button>
+
+            <button id="resetSettingsBtn">
+                Reset Defaults
+            </button>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>
