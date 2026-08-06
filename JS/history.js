@@ -1,4 +1,4 @@
-import { readScores, clearHistory } from "./utility.js";
+import { getMatch, clearHistory } from "./utility.js";
 
 
 const historyForm = document.getElementById("historyForm");
@@ -28,9 +28,9 @@ historyForm.addEventListener("submit", (event) => {
         return;
     }
 
-    const results = readScores(p1, p2);
+    const results = getMatch(p1, p2);
 
-    if (results === -1) {
+    if (!results) {
         errorMessageEl.textContent = "No history found between these two";
         matchHistoryContainer.innerHTML = "";
         return;
@@ -49,14 +49,18 @@ historyForm.addEventListener("submit", (event) => {
     errorMessageEl.textContent = "";
     matchHistoryContainer.innerHTML = "";
 
+    let rows = "";
+
     for (let i = results.scores.length - 1; i >= 0; i--) {
-        matchHistoryContainer.innerHTML += `
+        rows += `
         <tr>
             <td>${results.scores[i][0]}</td>
             <td>${results.scores[i][1]}</td>
             <td>${results.scores[i][2]}</td>
         </tr>`;
     }
+
+    matchHistoryContainer.innerHTML = rows;
 });
 
 

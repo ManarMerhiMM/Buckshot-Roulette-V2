@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stats - Buckshot Roulette</title>
+    <link rel="icon" type="image/svg+xml" href="Assets/Icons/history.svg">
+    <link rel="stylesheet" href="CSS/styles.css">
+    <link rel="stylesheet" href="CSS/stats.css">
+    <script type="module" src="JS/stats.js"></script>
+</head>
+
+<body>
+
+    <header class="page-header">
+        <a href="index.html" class="back-link">‹ Back to menu</a>
+        <h1 class="page-title">Stats</h1>
+        <p class="tagline">Every chamber, tallied.</p>
+    </header>
+
+    <main class="content">
+
+        <section class="stat-section">
+            <h2>General</h2>
+
+            <div class="stat-row">
+                <span class="label">Total Matches</span>
+                <span class="leader"></span>
+                <span class="value" id="totalMatches">—</span>
+            </div>
+
+            <div class="stat-row">
+                <span class="label">Total Rounds</span>
+                <span class="leader"></span>
+                <span class="value" id="totalRounds">—</span>
+            </div>
+
+            <div class="stat-row">
+                <span class="label">Average Rounds Per Match</span>
+                <span class="leader"></span>
+                <span class="value" id="roundsPerMatch">—</span>
+            </div>
+        </section>
+
+        <section class="stat-section">
+            <h2>Items</h2>
+
+            <div class="stat-row">
+                <span class="label">Saws Used</span>
+                <span class="leader"></span>
+                <span class="value" id="sawsUsed">—</span>
+            </div>
+
+            <div class="stat-row">
+                <span class="label">Magnifying Lenses Used</span>
+                <span class="leader"></span>
+                <span class="value" id="magnifyingLensesUsed">—</span>
+            </div>
+
+            <div class="stat-row">
+                <span class="label">Phones Used</span>
+                <span class="leader"></span>
+                <span class="value" id="phonesUsed">—</span>
+            </div>
+
+            <div class="stat-row">
+                <span class="label">Beers Used</span>
+                <span class="leader"></span>
+                <span class="value" id="beersUsed">—</span>
+            </div>
+
+            <div class="stat-row">
+                <span class="label">Smokes Used</span>
+                <span class="leader"></span>
+                <span class="value" id="smokesUsed">—</span>
+            </div>
+
+            <div class="stat-row">
+                <span class="label">Deadly Pills Used</span>
+                <span class="leader"></span>
+                <span class="value" id="deadlyPillsUsed">—</span>
+            </div>
+
+            <div class="stat-row">
+                <span class="label">Chains Used</span>
+                <span class="leader"></span>
+                <span class="value" id="chainsUsed">—</span>
+            </div>
+
+            <div class="stat-row">
+                <span class="label">Inverters Used</span>
+                <span class="leader"></span>
+                <span class="value" id="invertersUsed">—</span>
+            </div>
+        </section>
+
+        <section class="stat-section">
+            <h2>Luck</h2>
+
+            <div class="stat-row">
+                <span class="label">Longest Live Streak</span>
+                <span class="leader"></span>
+                <span class="value" id="longestLiveStreak">—</span>
+            </div>
+
+            <div class="stat-row">
+                <span class="label">Longest Blank Streak</span>
+                <span class="leader"></span>
+                <span class="value" id="longestBlankStreak">—</span>
+            </div>
+
+            <div class="stat-row">
+                <span class="label">Closest Call</span>
+                <span class="leader"></span>
+                <span class="value" id="closestCall">—</span>
+            </div>
+
+            <div class="stat-row">
+                <span class="label">Most Damage Survived Before Winning</span>
+                <span class="leader"></span>
+                <span class="value" id="mostDamageSurvived">—</span>
+            </div>
+
+            <div class="stat-row">
+                <span class="label">Most Consecutive Safe Self-Shots</span>
+                <span class="leader"></span>
+                <span class="value" id="consecutiveSelfShots">—</span>
+            </div>
+        </section>
+
+        <button type="button" id="resetStatsBtn">Reset Stats</button>
+
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,163 @@
+/* ============================================================
+   STATS PAGE — extends styles.css. Load this file after
+   styles.css so the shared theme (fonts, palette, body grain)
+   is already in place.
+   ============================================================ */
+
+body {
+    justify-content: flex-start;
+    padding: 72px 24px 96px;
+    gap: 0;
+}
+
+/* ---------- Page header (shared pattern with about.css / history.css) ---------- */
+
+.page-header {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.back-link {
+    align-self: flex-start;
+    margin-left: max(4px, calc(50% - 340px));
+    margin-bottom: 28px;
+
+    color: #e7b700;
+    text-decoration: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 200ms ease;
+}
+
+.back-link:hover,
+.back-link:focus-visible {
+    color: var(--blood-hot);
+}
+
+.page-title {
+    font-family: 'Black Ops One', sans-serif;
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--bone);
+    text-shadow:
+        0 0 18px rgba(226, 66, 42, 0.3),
+        3px 3px 0 rgba(0, 0, 0, 0.6);
+}
+
+.page-header .tagline {
+    margin-top: 12px;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--brass);
+}
+
+.content {
+    width: min(560px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+}
+
+/* ---------- Stat sections ---------- */
+
+.stat-section {
+    width: 100%;
+}
+
+.stat-section h2 {
+    font-family: 'Black Ops One', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #2a2318;
+}
+
+.stat-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 8px 0;
+    font-family: 'Space Mono', monospace;
+}
+
+.stat-row .label {
+    flex: 0 0 auto;
+    font-size: 0.92rem;
+    color: #c9c4b5;
+    white-space: nowrap;
+}
+
+.stat-row .leader {
+    flex: 1 1 auto;
+    height: 0;
+    border-bottom: 2px dotted var(--brass-dim);
+    transform: translateY(-4px);
+}
+
+.stat-row .value {
+    flex: 0 0 auto;
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--brass);
+    min-width: 2.5ch;
+    text-align: right;
+}
+
+/* ---------- Reset button ---------- */
+
+#resetStatsBtn {
+    padding: 11px 26px;
+    background: linear-gradient(180deg, var(--panel), #0f0d0a);
+    border: 1px solid #2a2318;
+    border-top: 3px solid var(--blood);
+    border-radius: 4px 4px 2px 2px;
+    color: var(--bone);
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 220ms ease, transform 160ms ease, box-shadow 220ms ease;
+}
+
+#resetStatsBtn:hover,
+#resetStatsBtn:focus-visible {
+    border-top-color: var(--blood-hot);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px -12px rgba(0, 0, 0, 0.9), 0 0 18px -6px rgba(226, 66, 42, 0.4);
+    outline: none;
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 600px) {
+    body {
+        padding: 48px 18px 72px;
+    }
+
+    .back-link {
+        margin-left: 0;
+    }
+
+    .stat-row .label {
+        font-size: 0.85rem;
+    }
+
+    .stat-row .value {
+        font-size: 0.9rem;
+    }
+}

@@ -54,48 +54,110 @@ const COLORS = {
     LIGHT_GREY: "#d1d1d1"
 };
 
-const readScores = function (p1Name, p2Name) {
-    p1Name = p1Name.toLowerCase();
-    p2Name = p2Name.toLowerCase();
-    const results = localStorage.getItem(`${BUCKSHOTROULETTE}-${p1Name}-${p2Name}`) || localStorage.getItem(`${BUCKSHOTROULETTE}-${p2Name}-${p1Name}`);
+const DEFAULTSTATS = {
+    totalMatches: 0,
+    totalRounds: 0,
+    itemFrequencies: {
+        saw: 0,
+        magnifyingLens: 0,
+        phone: 0,
+        beer: 0,
+        smoke: 0,
+        deadlyPill: 0,
+        chains: 0,
+        inverter: 0
+    },
+    longestLiveStreak: 0,
+    longestBlankStreak: 0,
+    closestCall: 0,
+    mostDamageSurvived: 0,
+    longestConsecutiveSelfShots: 0
+};
 
-    if (!results)
-        return -1; // No stored results for these 2 players found
+const DEFAULTSETTINGS = {
+    minHealth: 2,
+    maxHealth: 4,
+    minItems: 0,
+    maxItems: 2,
+    p1Color: "#ff0000",
+    p2Color: "#00ffff"
+};
 
+
+const getData = function () {
+    const raw = localStorage.getItem(BUCKSHOTROULETTE);
+
+    if (!raw) {
+        return {
+            matches: [],
+            stats: structuredClone(DEFAULTSTATS),
+            settings: structuredClone(DEFAULTSETTINGS)
+        };
+    }
 
     try {
-        return JSON.parse(results);
+        return JSON.parse(raw);
     }
     catch {
-        return -1; // Corrupt storage
+        return {
+            matches: [],
+            stats: structuredClone(DEFAULTSTATS),
+            settings: structuredClone(DEFAULTSETTINGS)
+        };
     }
+};
 
+const getMatchIdx = function (p1Name, p2Name) {
+    p1Name = p1Name.toLowerCase();
+    p2Name = p2Name.toLowerCase();
+
+    const data = getData();
+
+    return data.matches.findIndex(match =>
+        (match.players.p1 === p1Name && match.players.p2 === p2Name) ||
+        (match.players.p1 === p2Name && match.players.p2 === p1Name)
+    );
+};
+
+
+const getMatch = function (p1Name, p2Name) {
+    p1Name = p1Name.toLowerCase();
+    p2Name = p2Name.toLowerCase();
+
+    const data = getData();
+
+    return data.matches.find(match =>
+        (match.players.p1 === p1Name && match.players.p2 === p2Name) ||
+        (match.players.p1 === p2Name && match.players.p2 === p1Name)
+    );
 };
 
 const writeScores = function (p1Name, p2Name, score1, score2) {
     p1Name = p1Name.toLowerCase();
     p2Name = p2Name.toLowerCase();
-    const curResults = readScores(p1Name, p2Name);
+    const matchIdx = getMatchIdx(p1Name, p2Name);
+    const data = getData();
     const date = new Date().toLocaleDateString("en-GB"); // dd/mm/yyyy
 
-    if (curResults === -1) {
-        localStorage.setItem(`${BUCKSHOTROULETTE}-${p1Name}-${p2Name}`, JSON.stringify({
+    if (matchIdx === -1) {
+        data.matches.push({
             players: {
                 p1: p1Name,
                 p2: p2Name
             },
             scores: [[score1, score2, date]]
-        }));
+        });
+        localStorage.setItem(BUCKSHOTROULETTE, JSON.stringify(data));
     }
     else {
-        if (curResults.players.p1 === p2Name) {
-            curResults.scores.push([score2, score1, date]);
-            localStorage.setItem(`${BUCKSHOTROULETTE}-${p2Name}-${p1Name}`, JSON.stringify(curResults));
+        if (data.matches[matchIdx].players.p1 === p2Name) {
+            data.matches[matchIdx].scores.push([score2, score1, date]);
         }
         else {
-            curResults.scores.push([score1, score2, date]);
-            localStorage.setItem(`${BUCKSHOTROULETTE}-${p1Name}-${p2Name}`, JSON.stringify(curResults));
+            data.matches[matchIdx].scores.push([score1, score2, date]);
         }
+
+        localStorage.setItem(BUCKSHOTROULETTE, JSON.stringify(data));
     }
 };
 
@@ -104,34 +166,56 @@ const clearHistory = function (p1Name, p2Name) {
     p1Name = p1Name.toLowerCase();
     p2Name = p2Name.toLowerCase();
 
-    localStorage.removeItem(`${BUCKSHOTROULETTE}-${p1Name}-${p2Name}`);
-    localStorage.removeItem(`${BUCKSHOTROULETTE}-${p2Name}-${p1Name}`);
+    const data = getData();
+    const matchIdx = getMatchIdx(p1Name, p2Name);
+
+    if (matchIdx === -1)
+        return;
+
+    data.matches.splice(matchIdx, 1);
+
+    localStorage.setItem(BUCKSHOTROULETTE, JSON.stringify(data));
 };
 
-const getDefaults = async function () {
-    const response = await fetch("./Data/Defaults.json");
-    return await response.json();
-};
-
-const readSettings = async function () {
-    const settings = localStorage.getItem(`${BUCKSHOTROULETTE}-Settings`);
-
-    if (settings) {
-        try {
-            return JSON.parse(settings);
-        }
-        catch {
-            return getDefaults();
-        }
-    }
-
-    return getDefaults();
+const readSettings = function () {
+    return getData().settings;
 };
 
 const writeSettings = function (settings) {
-    localStorage.setItem(`${BUCKSHOTROULETTE}-Settings`, JSON.stringify(settings));
+    const data = getData();
+
+    data.settings = settings;
+
+    localStorage.setItem(BUCKSHOTROULETTE, JSON.stringify(data));
 };
 
+const resetSettings = function(){
+    const data = getData();
+
+    data.settings = structuredClone(DEFAULTSETTINGS);
+
+    localStorage.setItem(BUCKSHOTROULETTE, JSON.stringify(data));
+};
+
+const readStats = function(){
+    return getData().stats;
+};
+
+const writeStats = function(stats){
+    const data = getData();
+
+    data.stats = stats;
+
+    localStorage.setItem(BUCKSHOTROULETTE, JSON.stringify(data));
+};
+
+const resetStats = function(){
+    const data = getData();
+
+    data.stats = structuredClone(DEFAULTSTATS);
+
+    localStorage.setItem(BUCKSHOTROULETTE, JSON.stringify(data));
+};
 
 const getRandom = function (array) {
     return array[Math.floor(Math.random() * array.length)];
@@ -166,4 +250,4 @@ const getPermutation = function (combination) {
 
 
 
-export { COMBINATIONS, ITEMS, COLORS, readScores, writeScores, clearHistory, readSettings, writeSettings, getRandom, getPermutation };
+export { COMBINATIONS, ITEMS, COLORS, getMatch, writeScores, clearHistory, readSettings, writeSettings, resetSettings, readStats, writeStats, resetStats, getRandom, getPermutation };
