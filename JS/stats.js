@@ -1,5 +1,17 @@
 import { readStats, resetStats } from "./utility.js";
 
+const formatRecord = function (record) {
+    if (record.val === 0 || record.players.length === 0) {
+        return "0";
+    }
+
+    const players = record.players
+        .map(player => `<span class="player-name">${player}</span>`)
+        .join(", ");
+
+    return `${record.val} by ${players}`;
+};
+
 const renderStats = function () {
     const stats = readStats();
 
@@ -20,11 +32,11 @@ const renderStats = function () {
     document.getElementById("chainsUsed").textContent = stats.itemFrequencies.chains;
     document.getElementById("invertersUsed").textContent = stats.itemFrequencies.inverter;
 
-    document.getElementById("longestLiveStreak").textContent = stats.longestLiveStreak;
-    document.getElementById("longestBlankStreak").textContent = stats.longestBlankStreak;
-    document.getElementById("closestCall").textContent = stats.closestCall;
-    document.getElementById("mostDamageSurvived").textContent = stats.mostDamageSurvived;
-    document.getElementById("consecutiveSelfShots").textContent = stats.longestConsecutiveSelfShots;
+    document.getElementById("longestLiveStreak").innerHTML = formatRecord(stats.longestLiveStreak);
+    document.getElementById("longestBlankStreak").innerHTML = formatRecord(stats.longestBlankStreak);
+    document.getElementById("closestCall").innerHTML = formatRecord(stats.closestCall);
+    document.getElementById("mostDamageSurvived").innerHTML = formatRecord(stats.mostDamageSurvived);
+    document.getElementById("consecutiveSelfShots").innerHTML = formatRecord(stats.longestConsecutiveSelfShots);
 }
 
 
@@ -38,7 +50,7 @@ document.getElementById("resetStatsBtn").addEventListener("click", () => {
 
     resetStats();
     renderStats();
-    
+
     window.scrollTo({
         top: 0,
         behavior: "smooth"

@@ -1,16 +1,10 @@
-/* ============================================================
-   HISTORY PAGE — extends styles.css. Load this file after
-   styles.css so the shared theme (fonts, palette, body grain)
-   is already in place.
-   ============================================================ */
-
 body {
     justify-content: flex-start;
     padding: 72px 24px 96px;
     gap: 0;
 }
 
-/* ---------- Page header (shared pattern with about.css) ---------- */
+/* ---------- Page header ---------- */
 
 .page-header {
     position: relative;

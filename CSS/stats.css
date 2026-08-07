@@ -1,16 +1,10 @@
-/* ============================================================
-   STATS PAGE — extends styles.css. Load this file after
-   styles.css so the shared theme (fonts, palette, body grain)
-   is already in place.
-   ============================================================ */
-
 body {
     justify-content: flex-start;
     padding: 72px 24px 96px;
     gap: 0;
 }
 
-/* ---------- Page header (shared pattern with about.css / history.css) ---------- */
+/* ---------- Page header ---------- */
 
 .page-header {
     position: relative;
@@ -87,32 +81,42 @@ body {
 
 .stat-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
-    gap: 10px;
+    gap: 8px 10px;
     padding: 8px 0;
     font-family: 'Space Mono', monospace;
 }
 
 .stat-row .label {
     flex: 0 0 auto;
-    font-size: 0.92rem;
+    font-size: 1rem;
     color: #c9c4b5;
     white-space: nowrap;
 }
 
 .stat-row .leader {
-    flex: 1 1 auto;
+    flex: 1 1 30px;
+    min-width: 20px;
     height: 0;
     border-bottom: 2px dotted var(--brass-dim);
     transform: translateY(-4px);
 }
 
 .stat-row .value {
-    flex: 0 0 auto;
-    font-size: 0.98rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px 6px;
+
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
+
+    font-size: 1rem;
     font-weight: 700;
     color: var(--brass);
-    min-width: 2.5ch;
     text-align: right;
 }
 
@@ -142,9 +146,80 @@ body {
     outline: none;
 }
 
+.player-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+
+    padding: 2px 10px 2px 8px;
+    margin: 0 1px;
+
+    background: linear-gradient(135deg, #fbe9b8 0%, #e6c065 30%, #c9962c 55%, #8a6a24 80%, #e6c065 100%);
+    background-size: 220% 220%;
+
+    color: #1a1408;
+    font-weight: 700;
+    font-size: 0.85em;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    border-radius: 3px;
+    border: 1px solid #7a5f22;
+
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.35) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.25) inset,
+        0 3px 8px rgba(0, 0, 0, 0.5);
+
+    animation: player-name-shimmer 5s ease-in-out infinite;
+}
+
+.player-name::before {
+    content: "★";
+    font-size: 0.75em;
+    color: #ff0202;
+    opacity: 0.75;
+    
+}
+
+@keyframes player-name-shimmer {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
 /* ---------- Mobile ---------- */
 
-@media (max-width: 600px) {
+@media screen and (max-width: 600px) {
+    body {
+        padding: 48px 18px 72px;
+    }
+
+    .back-link {
+        margin-left: 0;
+    }
+
+    .page-header .tagline{
+        font-size: 0.7rem;
+    }
+
+    .stat-row .label {
+        font-size: 0.85rem;
+    }
+
+    .stat-row .value {
+        font-size: 0.9rem;
+    }
+}
+
+
+@media screen and (max-width: 400px) {
     body {
         padding: 48px 18px 72px;
     }
@@ -154,10 +229,14 @@ body {
     }
 
     .stat-row .label {
-        font-size: 0.85rem;
+        font-size: 0.7rem;
+    }
+
+     .page-header .tagline{
+        font-size: 0.6rem;
     }
 
     .stat-row .value {
-        font-size: 0.9rem;
+        font-size: 0.75rem;
     }
 }

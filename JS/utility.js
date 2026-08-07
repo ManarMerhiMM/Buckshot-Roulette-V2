@@ -48,11 +48,12 @@ const DEFAULTSTATS = {
         chains: 0,
         inverter: 0
     },
-    longestLiveStreak: 0,
-    longestBlankStreak: 0,
-    closestCall: 0,
-    mostDamageSurvived: 0,
-    longestConsecutiveSelfShots: 0
+
+    longestLiveStreak: { val: 0, players: [] },
+    longestBlankStreak: { val: 0, players: [] },
+    closestCall: { val: 0, players: [] },
+    mostDamageSurvived: { val: 0, players: [] },
+    longestConsecutiveSelfShots: { val: 0, players: [] }
 };
 
 const DEFAULTSETTINGS = {
@@ -64,6 +65,17 @@ const DEFAULTSETTINGS = {
     p2Color: "#0a64ca"
 };
 
+
+const SOUNDS = {
+    CLICK: "../Assets/SFX/click.mp3",
+    SHOT: "../Assets/SFX/shot.mp3",
+    BLANK: "../Assets/SFX/blank.mp3",
+    RELOAD: "../Assets/SFX/reload.mp3",
+    ITEM: "../Assets/SFX/item.mp3",
+    WIN: "../Assets/SFX/win.mp3",
+    LOSE: "../Assets/SFX/lose.mp3",
+    DAMAGE: "../Assets/SFX/damage.mp3"
+};
 
 const getData = function () {
     const raw = localStorage.getItem(BUCKSHOTROULETTE);
@@ -170,7 +182,7 @@ const writeSettings = function (settings) {
     localStorage.setItem(BUCKSHOTROULETTE, JSON.stringify(data));
 };
 
-const resetSettings = function(){
+const resetSettings = function () {
     const data = getData();
 
     data.settings = structuredClone(DEFAULTSETTINGS);
@@ -178,11 +190,11 @@ const resetSettings = function(){
     localStorage.setItem(BUCKSHOTROULETTE, JSON.stringify(data));
 };
 
-const readStats = function(){
+const readStats = function () {
     return getData().stats;
 };
 
-const writeStats = function(stats){
+const writeStats = function (stats) {
     const data = getData();
 
     data.stats = stats;
@@ -190,7 +202,7 @@ const writeStats = function(stats){
     localStorage.setItem(BUCKSHOTROULETTE, JSON.stringify(data));
 };
 
-const resetStats = function(){
+const resetStats = function () {
     const data = getData();
 
     data.stats = structuredClone(DEFAULTSTATS);
@@ -231,4 +243,4 @@ const getPermutation = function (combination) {
 
 
 
-export { COMBINATIONS, ITEMS, getMatch, writeScores, clearHistory, readSettings, writeSettings, resetSettings, readStats, writeStats, resetStats, getRandom, getPermutation };
+export { COMBINATIONS, ITEMS, SOUNDS, getMatch, writeScores, clearHistory, readSettings, writeSettings, resetSettings, readStats, writeStats, resetStats, getRandom, getPermutation };
