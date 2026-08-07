@@ -1,12 +1,20 @@
 import { readStats, resetStats } from "./utility.js";
 
+
+let hasPlayed = false;
+
+
 const formatRecord = function (record) {
     if (record.val === 0 || record.players.length === 0) {
         return "0";
     }
 
+    if (record.players.length === 1) {
+        return `${record.val} by <span class="player-name-special">${record.players[0]}</span>`
+    }
+
     const players = record.players
-        .map(player => `<span class="player-name">${player}</span>`)
+        .map(player => `<span class="player-name-regular">${player}</span>`)
         .join(", ");
 
     return `${record.val} by ${players}`;
@@ -56,3 +64,38 @@ document.getElementById("resetStatsBtn").addEventListener("click", () => {
         behavior: "smooth"
     });
 });
+
+
+
+const playStatsIntro = async function () {
+    if (hasPlayed) return;
+    hasPlayed = true;
+
+    try {
+        await new Audio("./Assets/SFX/stats_on_load.mp3").play();
+
+        setTimeout(() => {
+            document.querySelectorAll(".player-name-special").forEach(player =>
+                player.classList.add("player-name-special-shot")
+            );
+            document.querySelectorAll(".player-name-regular").forEach(player =>
+                player.classList.add("player-name-regular-shot")
+            );
+        }, 3200);
+
+    } catch (err) {
+        console.warn("Audio playback was blocked or failed:", err);
+
+        document.querySelectorAll(".player-name-special").forEach(player =>
+            player.classList.add("player-name-special-shot")
+        );
+        document.querySelectorAll(".player-name-regular").forEach(player =>
+            player.classList.add("player-name-regular-shot")
+        );
+    }
+
+
+};
+
+// Try on page load
+playStatsIntro();

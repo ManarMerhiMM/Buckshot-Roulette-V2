@@ -146,7 +146,12 @@ body {
     outline: none;
 }
 
-.player-name {
+/* Commons between player classes */
+.player-name-regular,
+.player-name-special {
+    position: relative;
+    overflow: hidden;
+
     display: inline-flex;
     align-items: center;
     gap: 2px;
@@ -154,8 +159,7 @@ body {
     padding: 2px 10px 2px 8px;
     margin: 0 1px;
 
-    background: linear-gradient(135deg, #fbe9b8 0%, #e6c065 30%, #c9962c 55%, #8a6a24 80%, #e6c065 100%);
-    background-size: 220% 220%;
+    background-size: 300% 300%;
 
     color: #1a1408;
     font-weight: 700;
@@ -163,35 +167,137 @@ body {
     letter-spacing: 0.08em;
     text-transform: uppercase;
 
-    border-radius: 3px;
-    border: 1px solid #7a5f22;
+    border-radius: 5px;
 
     box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.35) inset,
-        0 -1px 0 rgba(0, 0, 0, 0.25) inset,
+        0 1px 0 rgba(255, 255, 255, 0.5) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.3) inset,
         0 3px 8px rgba(0, 0, 0, 0.5);
-
-    animation: player-name-shimmer 5s ease-in-out infinite;
 }
 
-.player-name::before {
-    content: "★";
-    font-size: 0.75em;
-    color: #ff0202;
-    opacity: 0.75;
-    
+/* ---------- Silver (regular) ---------- */
+
+.player-name-regular {
+    background-image: linear-gradient(120deg,
+            #6e6e6e 0%,
+            #b8b8b8 22%,
+            #ffffff 40%,
+            #e2e2e2 52%,
+            #8c8c8c 70%,
+            #d4d4d4 88%,
+            #6e6e6e 100%);
+    border: 1px solid #7a7a7a;
+    animation: player-name-shimmer 3.5s linear infinite;
+}
+
+/* ---------- Gold (special) ---------- */
+
+.player-name-special {
+    background-image: linear-gradient(120deg,
+            #7a5f22 0%,
+            #c9962c 22%,
+            #fff6d8 40%,
+            #ffe08a 52%,
+            #a3781f 70%,
+            #e6c065 88%,
+            #7a5f22 100%);
+    border: 1px solid #8a6a24;
+    animation: player-name-shimmer 3.5s linear infinite;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.5) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.3) inset,
+        0 3px 8px rgba(0, 0, 0, 0.5),
+        0 0 10px rgba(255, 200, 90, 0.35);
+}
+
+/* ---------- Sweeping light streak overlay ---------- */
+
+.player-name-regular::after,
+.player-name-special::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 40%;
+    height: 100%;
+
+    background: linear-gradient(75deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.75) 50%,
+            transparent 100%);
+
+    transform: skewX(-20deg);
+    animation: player-name-streak 3.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.player-name-special::after {
+    background: linear-gradient(75deg,
+            transparent 0%,
+            rgba(255, 245, 200, 0.9) 50%,
+            transparent 100%);
 }
 
 @keyframes player-name-shimmer {
-
-    0%,
-    100% {
+    0% {
         background-position: 0% 50%;
     }
 
-    50% {
+    100% {
         background-position: 100% 50%;
     }
+}
+
+@keyframes player-name-streak {
+    0% {
+        left: -60%;
+    }
+
+    60% {
+        left: 130%;
+    }
+
+    100% {
+        left: 130%;
+    }
+}
+
+/* ---------- Icons (unchanged) ---------- */
+
+.player-name-regular-shot::before {
+    content: "";
+    display: inline-block;
+    width: 35px;
+    height: 35px;
+
+    background-image: url('../Assets/achievement_normal.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    mix-blend-mode: normal;
+    opacity: 1;
+}
+
+.player-name-special-shot::before {
+    content: "";
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+
+    background-image: url('../Assets/achievement_special.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    mix-blend-mode: normal;
+    opacity: 1;
 }
 
 /* ---------- Mobile ---------- */
@@ -205,7 +311,7 @@ body {
         margin-left: 0;
     }
 
-    .page-header .tagline{
+    .page-header .tagline {
         font-size: 0.7rem;
     }
 
@@ -216,6 +322,18 @@ body {
     .stat-row .value {
         font-size: 0.9rem;
     }
+
+    .player-name-regular::before {
+        width: 25px;
+        height: 25px;
+    }
+
+    .player-name-special::before {
+        width: 22px;
+        height: 22px;
+    }
+
+
 }
 
 
@@ -232,11 +350,21 @@ body {
         font-size: 0.7rem;
     }
 
-     .page-header .tagline{
+    .page-header .tagline {
         font-size: 0.6rem;
     }
 
     .stat-row .value {
         font-size: 0.75rem;
+    }
+
+    .player-name-regular::before {
+        width: 20px;
+        height: 20px;
+    }
+
+    .player-name-special::before {
+        width: 20px;
+        height: 20px;
     }
 }
