@@ -1,11 +1,12 @@
 import { readStats, resetStats } from "./utility.js";
 
+const achievementsSection = document.getElementById("achievementsSection");
 
-let hasPlayed = false;
-
+let tooltipEl = null;
+let activeLabel = null;
 
 const formatRecord = function (record) {
-    if (record.val === 0 || record.players.length === 0) {
+    if (record.players.length === 0) {
         return "0";
     }
 
@@ -18,6 +19,29 @@ const formatRecord = function (record) {
         .join(", ");
 
     return `${record.val} by ${players}`;
+};
+
+const formatTimeRecord = function (record) {
+    if (record.players.length === 0) {
+        return "0";
+    }
+
+    const minutes = Math.floor(record.val / 60);
+    const seconds = (record.val % 60).toFixed(2);
+
+    const time = minutes > 0
+        ? `${minutes}m ${seconds}s`
+        : `${seconds}s`;
+
+    if (record.players.length === 1) {
+        return `${time} by <span class="player-name-special">${record.players[0]}</span>`;
+    }
+
+    const players = record.players
+        .map(player => `<span class="player-name-regular">${player}</span>`)
+        .join(", ");
+
+    return `${time} by ${players}`;
 };
 
 const renderStats = function () {
@@ -41,14 +65,142 @@ const renderStats = function () {
     document.getElementById("invertersUsed").textContent = stats.itemFrequencies.inverter;
 
     document.getElementById("longestLiveStreak").innerHTML = formatRecord(stats.longestLiveStreak);
+    document.getElementById("liveStreakLabel").title = stats.longestLiveStreak.description;
+
     document.getElementById("longestBlankStreak").innerHTML = formatRecord(stats.longestBlankStreak);
+    document.getElementById("blankStreakLabel").title = stats.longestBlankStreak.description;
+
     document.getElementById("closestCall").innerHTML = formatRecord(stats.closestCall);
+    document.getElementById("closestCallLabel").title = stats.closestCall.description;
+
     document.getElementById("mostDamageSurvived").innerHTML = formatRecord(stats.mostDamageSurvived);
+    document.getElementById("mostDamageSurvivedLabel").title = stats.mostDamageSurvived.description;
+
     document.getElementById("consecutiveSelfShots").innerHTML = formatRecord(stats.longestConsecutiveSelfShots);
+    document.getElementById("mostConsecutiveSelfShotsLabel").title = stats.longestConsecutiveSelfShots.description;
+
+    document.getElementById("longestTurnsOn1HP").innerHTML = formatRecord(stats.longestTurnsOn1HP);
+    document.getElementById("longestTurnsOn1HPLabel").title = stats.longestTurnsOn1HP.description;
+
+    document.getElementById("mostItemsInARound").innerHTML = formatRecord(stats.mostItemsInARound);
+    document.getElementById("mostItemsInARoundLabel").title = stats.mostItemsInARound.description;
+
+    document.getElementById("biggestHPDeficitOvercome").innerHTML = formatRecord(stats.biggestHPDeficitOvercome);
+    document.getElementById("biggestHPDeficitOvercomeLabel").title = stats.biggestHPDeficitOvercome.description;
+
+    document.getElementById("consecutiveTurnsNoItem").innerHTML = formatRecord(stats.consecutiveTurnsNoItem);
+    document.getElementById("consecutiveTurnsNoItemLabel").title = stats.consecutiveTurnsNoItem.description;
+
+    document.getElementById("mostItemsHeld").innerHTML = formatRecord(stats.mostItemsHeld);
+    document.getElementById("mostItemsHeldLabel").title = stats.mostItemsHeld.description;
+
+    document.getElementById("fastestRound").innerHTML = formatTimeRecord(stats.fastestRound);
+    document.getElementById("fastestRoundLabel").title = stats.fastestRound.description;
+
+    document.getElementById("slowestRound").innerHTML = formatTimeRecord(stats.slowestRound);
+    document.getElementById("slowestRoundLabel").title = stats.slowestRound.description;
+
+    document.getElementById("mostConsecutiveNoCheck").innerHTML = formatRecord(stats.mostConsecutiveNoCheck);
+    document.getElementById("mostConsecutiveNoCheckLabel").title = stats.mostConsecutiveNoCheck.description;
+
+    document.getElementById("mostHealing").innerHTML = formatRecord(stats.mostHealing);
+    document.getElementById("mostHealingLabel").title = stats.mostHealing.description;
+
+    document.getElementById("mostInvertedUses").innerHTML = formatRecord(stats.mostInvertedUses);
+    document.getElementById("mostInvertedUsesLabel").title = stats.mostInvertedUses.description;
+
+    document.getElementById("mostBeerUses").innerHTML = formatRecord(stats.mostBeerUses);
+    document.getElementById("mostBeerUsesLabel").title = stats.mostBeerUses.description;
+
+    document.getElementById("mostLensUses").innerHTML = formatRecord(stats.mostLensUses);
+    document.getElementById("mostLensUsesLabel").title = stats.mostLensUses.description;
+
+    document.getElementById("mostPhoneUses").innerHTML = formatRecord(stats.mostPhoneUses);
+    document.getElementById("mostPhoneUsesLabel").title = stats.mostPhoneUses.description;
+
+    document.getElementById("mostSawUses").innerHTML = formatRecord(stats.mostSawUses);
+    document.getElementById("mostSawUsesLabel").title = stats.mostSawUses.description;
+
+    document.getElementById("mostChainUses").innerHTML = formatRecord(stats.mostChainUses);
+    document.getElementById("mostChainUsesLabel").title = stats.mostChainUses.description;
+
+    document.getElementById("leastDamageSurvived").innerHTML = formatRecord(stats.leastDamageSurvived);
+    document.getElementById("leastDamageSurvivedLabel").title = stats.leastDamageSurvived.description;
 }
 
 
 renderStats();
+
+const ensureTooltip = function () {
+    if (tooltipEl) return tooltipEl;
+
+    tooltipEl = document.createElement("div");
+    tooltipEl.className = "achievement-tooltip";
+    tooltipEl.setAttribute("role", "tooltip");
+    document.body.appendChild(tooltipEl);
+
+    return tooltipEl;
+};
+
+const positionTooltip = function (label) {
+    const rect = label.getBoundingClientRect();
+    const tip = tooltipEl.getBoundingClientRect();
+    const margin = 8;
+
+    // Prefer below the label; flip above if it would overflow the viewport.
+    let top = rect.bottom + margin;
+    if (top + tip.height > window.innerHeight - margin) {
+        top = rect.top - tip.height - margin;
+    }
+    top = Math.max(margin, top);
+
+    // Center horizontally over the label, then clamp inside the viewport.
+    let left = rect.left + rect.width / 2 - tip.width / 2;
+    left = Math.max(margin, Math.min(left, window.innerWidth - tip.width - margin));
+
+    tooltipEl.style.top = `${top}px`;
+    tooltipEl.style.left = `${left}px`;
+};
+
+const hideTooltip = function () {
+    if (tooltipEl) tooltipEl.classList.remove("is-visible");
+    activeLabel = null;
+};
+
+const showTooltip = function (label) {
+    const text = label.getAttribute("title");
+    if (!text) return;
+
+    ensureTooltip();
+    tooltipEl.textContent = text;   // set text first so size is correct
+    positionTooltip(label);         // measure & place while still hidden
+    tooltipEl.classList.add("is-visible");
+    activeLabel = label;
+};
+
+if (achievementsSection) {
+    // Toggle the tooltip when an achievement label is tapped/clicked.
+    achievementsSection.addEventListener("click", (e) => {
+        const label = e.target.closest(".label");
+        if (!label) return;
+
+        e.stopPropagation(); // keep the document handler below from closing it
+
+        if (activeLabel === label) {
+            hideTooltip();
+        } else {
+            showTooltip(label);
+        }
+    });
+}
+
+// Dismiss on any outside tap/click, on scroll, on resize, or on Escape.
+document.addEventListener("click", hideTooltip);
+window.addEventListener("scroll", hideTooltip, { passive: true });
+window.addEventListener("resize", hideTooltip);
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") hideTooltip();
+});
 
 
 document.getElementById("resetStatsBtn").addEventListener("click", () => {
@@ -58,6 +210,7 @@ document.getElementById("resetStatsBtn").addEventListener("click", () => {
 
     resetStats();
     renderStats();
+    hideTooltip();
 
     window.scrollTo({
         top: 0,
@@ -68,8 +221,8 @@ document.getElementById("resetStatsBtn").addEventListener("click", () => {
 
 
 const playStatsIntro = async function () {
-    if (hasPlayed) return;
-    hasPlayed = true;
+    if (document.querySelectorAll(".player-name-special").length === 0 && document.querySelectorAll(".player-name-regular").length === 0)
+        return;
 
     try {
         await new Audio("./Assets/SFX/stats_on_load.mp3").play();

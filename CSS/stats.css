@@ -120,6 +120,54 @@ body {
     text-align: right;
 }
 
+/* Achievement labels are interactive: hover (desktop) or tap (mobile) to
+   reveal the description. The dotted underline hints that they're tappable. */
+#achievementsSection .stat-row .label {
+    cursor: help;
+}
+
+/* ---------- Achievement tooltip (tap / click) ---------- */
+
+.achievement-tooltip {
+    position: fixed;
+    z-index: 1000;
+    max-width: min(280px, calc(100vw - 24px));
+    padding: 10px 13px;
+
+    background: linear-gradient(180deg, var(--panel), #0f0d0a);
+    border: 1px solid #2a2318;
+    border-top: 2px solid var(--brass);
+    border-radius: 4px;
+
+    color: #d8d3c4;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+
+    box-shadow:
+        0 14px 30px -12px rgba(0, 0, 0, 0.9),
+        0 0 16px -6px rgba(226, 66, 42, 0.35);
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity 160ms ease, transform 160ms ease, visibility 160ms ease;
+    pointer-events: none;
+}
+
+.achievement-tooltip.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+#achievementsSection .tagline{
+    font-size: 0.9rem;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 /* ---------- Reset button ---------- */
 
 #resetStatsBtn {
@@ -333,6 +381,10 @@ body {
         height: 22px;
     }
 
+    .achievement-tooltip {
+        font-size: 0.7rem;
+    }
+
 
 }
 
@@ -366,5 +418,8 @@ body {
     .player-name-special::before {
         width: 20px;
         height: 20px;
+    }
+    .achievement-tooltip {
+        font-size: 0.6rem;
     }
 }
