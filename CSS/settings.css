@@ -109,7 +109,7 @@ body {
     text-transform: uppercase;
 }
 
-.setting-row input[type="number"] {
+.setting-row input[type="number"], .setting-row input[type="text"]  {
     width: 90px;
     padding: 8px;
 
@@ -123,7 +123,7 @@ body {
     text-align: center;
 }
 
-.setting-row input[type="number"]:focus {
+.setting-row input[type="number"]:focus, .setting-row input[type="text"]:focus {
     outline: none;
     border-color: var(--brass);
 }

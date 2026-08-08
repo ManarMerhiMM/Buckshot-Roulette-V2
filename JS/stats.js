@@ -65,67 +65,67 @@ const renderStats = function () {
     document.getElementById("invertersUsed").textContent = stats.itemFrequencies.inverter;
 
     document.getElementById("longestLiveStreak").innerHTML = formatRecord(stats.longestLiveStreak);
-    document.getElementById("liveStreakLabel").title = stats.longestLiveStreak.description;
+    document.getElementById("liveStreakLabel").dataset.description = stats.longestLiveStreak.description;
 
     document.getElementById("longestBlankStreak").innerHTML = formatRecord(stats.longestBlankStreak);
-    document.getElementById("blankStreakLabel").title = stats.longestBlankStreak.description;
+    document.getElementById("blankStreakLabel").dataset.description = stats.longestBlankStreak.description;
 
     document.getElementById("closestCall").innerHTML = formatRecord(stats.closestCall);
-    document.getElementById("closestCallLabel").title = stats.closestCall.description;
+    document.getElementById("closestCallLabel").dataset.description = stats.closestCall.description;
 
     document.getElementById("mostDamageSurvived").innerHTML = formatRecord(stats.mostDamageSurvived);
-    document.getElementById("mostDamageSurvivedLabel").title = stats.mostDamageSurvived.description;
+    document.getElementById("mostDamageSurvivedLabel").dataset.description = stats.mostDamageSurvived.description;
 
     document.getElementById("consecutiveSelfShots").innerHTML = formatRecord(stats.longestConsecutiveSelfShots);
-    document.getElementById("mostConsecutiveSelfShotsLabel").title = stats.longestConsecutiveSelfShots.description;
+    document.getElementById("mostConsecutiveSelfShotsLabel").dataset.description = stats.longestConsecutiveSelfShots.description;
 
     document.getElementById("longestTurnsOn1HP").innerHTML = formatRecord(stats.longestTurnsOn1HP);
-    document.getElementById("longestTurnsOn1HPLabel").title = stats.longestTurnsOn1HP.description;
+    document.getElementById("longestTurnsOn1HPLabel").dataset.description = stats.longestTurnsOn1HP.description;
 
     document.getElementById("mostItemsInARound").innerHTML = formatRecord(stats.mostItemsInARound);
-    document.getElementById("mostItemsInARoundLabel").title = stats.mostItemsInARound.description;
+    document.getElementById("mostItemsInARoundLabel").dataset.description = stats.mostItemsInARound.description;
 
     document.getElementById("biggestHPDeficitOvercome").innerHTML = formatRecord(stats.biggestHPDeficitOvercome);
-    document.getElementById("biggestHPDeficitOvercomeLabel").title = stats.biggestHPDeficitOvercome.description;
+    document.getElementById("biggestHPDeficitOvercomeLabel").dataset.description = stats.biggestHPDeficitOvercome.description;
 
     document.getElementById("consecutiveTurnsNoItem").innerHTML = formatRecord(stats.consecutiveTurnsNoItem);
-    document.getElementById("consecutiveTurnsNoItemLabel").title = stats.consecutiveTurnsNoItem.description;
+    document.getElementById("consecutiveTurnsNoItemLabel").dataset.description = stats.consecutiveTurnsNoItem.description;
 
     document.getElementById("mostItemsHeld").innerHTML = formatRecord(stats.mostItemsHeld);
-    document.getElementById("mostItemsHeldLabel").title = stats.mostItemsHeld.description;
+    document.getElementById("mostItemsHeldLabel").dataset.description = stats.mostItemsHeld.description;
 
     document.getElementById("fastestRound").innerHTML = formatTimeRecord(stats.fastestRound);
-    document.getElementById("fastestRoundLabel").title = stats.fastestRound.description;
+    document.getElementById("fastestRoundLabel").dataset.description = stats.fastestRound.description;
 
     document.getElementById("slowestRound").innerHTML = formatTimeRecord(stats.slowestRound);
-    document.getElementById("slowestRoundLabel").title = stats.slowestRound.description;
+    document.getElementById("slowestRoundLabel").dataset.description = stats.slowestRound.description;
 
     document.getElementById("mostConsecutiveNoCheck").innerHTML = formatRecord(stats.mostConsecutiveNoCheck);
-    document.getElementById("mostConsecutiveNoCheckLabel").title = stats.mostConsecutiveNoCheck.description;
+    document.getElementById("mostConsecutiveNoCheckLabel").dataset.description = stats.mostConsecutiveNoCheck.description;
 
     document.getElementById("mostHealing").innerHTML = formatRecord(stats.mostHealing);
-    document.getElementById("mostHealingLabel").title = stats.mostHealing.description;
+    document.getElementById("mostHealingLabel").dataset.description = stats.mostHealing.description;
 
     document.getElementById("mostInvertedUses").innerHTML = formatRecord(stats.mostInvertedUses);
-    document.getElementById("mostInvertedUsesLabel").title = stats.mostInvertedUses.description;
+    document.getElementById("mostInvertedUsesLabel").dataset.description = stats.mostInvertedUses.description;
 
     document.getElementById("mostBeerUses").innerHTML = formatRecord(stats.mostBeerUses);
-    document.getElementById("mostBeerUsesLabel").title = stats.mostBeerUses.description;
+    document.getElementById("mostBeerUsesLabel").dataset.description = stats.mostBeerUses.description;
 
     document.getElementById("mostLensUses").innerHTML = formatRecord(stats.mostLensUses);
-    document.getElementById("mostLensUsesLabel").title = stats.mostLensUses.description;
+    document.getElementById("mostLensUsesLabel").dataset.description = stats.mostLensUses.description;
 
     document.getElementById("mostPhoneUses").innerHTML = formatRecord(stats.mostPhoneUses);
-    document.getElementById("mostPhoneUsesLabel").title = stats.mostPhoneUses.description;
+    document.getElementById("mostPhoneUsesLabel").dataset.description = stats.mostPhoneUses.description;
 
     document.getElementById("mostSawUses").innerHTML = formatRecord(stats.mostSawUses);
-    document.getElementById("mostSawUsesLabel").title = stats.mostSawUses.description;
+    document.getElementById("mostSawUsesLabel").dataset.description = stats.mostSawUses.description;
 
     document.getElementById("mostChainUses").innerHTML = formatRecord(stats.mostChainUses);
-    document.getElementById("mostChainUsesLabel").title = stats.mostChainUses.description;
+    document.getElementById("mostChainUsesLabel").dataset.description = stats.mostChainUses.description;
 
     document.getElementById("leastDamageSurvived").innerHTML = formatRecord(stats.leastDamageSurvived);
-    document.getElementById("leastDamageSurvivedLabel").title = stats.leastDamageSurvived.description;
+    document.getElementById("leastDamageSurvivedLabel").dataset.description = stats.leastDamageSurvived.description;
 }
 
 
@@ -168,7 +168,7 @@ const hideTooltip = function () {
 };
 
 const showTooltip = function (label) {
-    const text = label.getAttribute("title");
+    const text = label.dataset.description;
     if (!text) return;
 
     ensureTooltip();

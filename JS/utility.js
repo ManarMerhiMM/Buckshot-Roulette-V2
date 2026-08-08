@@ -78,7 +78,9 @@ const DEFAULTSETTINGS = {
     minItems: 0,
     maxItems: 2,
     p1Color: "#ff0000",
-    p2Color: "#0a64ca"
+    p2Color: "#0a64ca",
+    p1Name: "Player 1",
+    p2Name: "Player 2"
 };
 
 const getData = function () {

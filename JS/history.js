@@ -68,9 +68,6 @@ clearHistoryBtn.addEventListener("click", () => {
     const p1 = p1Input.value.trim();
     const p2 = p2Input.value.trim();
 
-    if (!confirm(`Are you sure you want to clear ${p1} and ${p2} history?!`))
-        return;
-
     if (!p1 || !p2) {
         errorMessageEl.textContent = "Please provide the names of both players!";
         matchHistoryContainer.innerHTML = "";
@@ -82,6 +79,10 @@ clearHistoryBtn.addEventListener("click", () => {
         matchHistoryContainer.innerHTML = "";
         return;
     }
+
+    
+    if (!confirm(`Are you sure you want to clear ${p1} and ${p2} history?!`))
+        return;
 
     clearHistory(p1, p2);
     errorMessageEl.textContent = `Successfully cleared ${p1} and ${p2} history!`;
