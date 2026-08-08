@@ -124,6 +124,12 @@ const renderStats = function () {
     document.getElementById("mostChainUses").innerHTML = formatRecord(stats.mostChainUses);
     document.getElementById("mostChainUsesLabel").dataset.description = stats.mostChainUses.description;
 
+    document.getElementById("mostSmokeUses").innerHTML = formatRecord(stats.mostSmokeUses);
+    document.getElementById("mostSmokeUsesLabel").dataset.description = stats.mostSmokeUses.description;
+
+    document.getElementById("mostDeadlyPillUses").innerHTML = formatRecord(stats.mostDeadlyPillUses);
+    document.getElementById("mostDeadlyPillUsesLabel").dataset.description = stats.mostDeadlyPillUses.description;
+
     document.getElementById("leastDamageSurvived").innerHTML = formatRecord(stats.leastDamageSurvived);
     document.getElementById("leastDamageSurvivedLabel").dataset.description = stats.leastDamageSurvived.description;
 }

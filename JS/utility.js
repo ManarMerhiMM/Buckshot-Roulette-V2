@@ -1,15 +1,50 @@
 const BUCKSHOTROULETTE = "BuckshotRoulette";
 
+// Grouped by length so every length (2–8) is equally likely to be
+// picked, regardless of how many live/blank splits exist within it.
 const COMBINATIONS = [
-    [true, false],
-    [true, true, false],
-    [true, false, false],
-    [true, true, false, false],
-    [true, false, false, false],
-    [true, true, true, false, false, false],
-    [true, true, false, false, false, false],
-    [true, true, true, true, false, false],
-    [true, true, true, true, false, false, false, false]
+    [ // length 2
+        [true, false]
+    ],
+    [ // length 3
+        [true, false, false],
+        [true, true, false]
+    ],
+    [ // length 4
+        [true, false, false, false],
+        [true, true, false, false],
+        [true, true, true, false]
+    ],
+    [ // length 5
+        [true, false, false, false, false],
+        [true, true, false, false, false],
+        [true, true, true, false, false],
+        [true, true, true, true, false]
+    ],
+    [ // length 6
+        [true, false, false, false, false, false],
+        [true, true, false, false, false, false],
+        [true, true, true, false, false, false],
+        [true, true, true, true, false, false],
+        [true, true, true, true, true, false]
+    ],
+    [ // length 7
+        [true, false, false, false, false, false, false],
+        [true, true, false, false, false, false, false],
+        [true, true, true, false, false, false, false],
+        [true, true, true, true, false, false, false],
+        [true, true, true, true, true, false, false],
+        [true, true, true, true, true, true, false]
+    ],
+    [ // length 8
+        [true, false, false, false, false, false, false, false],
+        [true, true, false, false, false, false, false, false],
+        [true, true, true, false, false, false, false, false],
+        [true, true, true, true, false, false, false, false],
+        [true, true, true, true, true, false, false, false],
+        [true, true, true, true, true, true, false, false],
+        [true, true, true, true, true, true, true, false]
+    ]
 ];
 
 const ITEMS = [
@@ -69,6 +104,8 @@ const DEFAULTSTATS = {
     mostPhoneUses: { val: 0, players: [], description: "Most phone uses in one round" },
     mostSawUses: { val: 0, players: [], description: "Most saw uses in one round" },
     mostChainUses: { val: 0, players: [], description: "Most chains used in one round" },
+    mostSmokeUses: { val: 0, players: [], description: "Most smokes used in one round" },
+    mostDeadlyPillUses: { val: 0, players: [], description: "Most deadly pills used in one round" },
     leastDamageSurvived: { val: 0, players: [], description: "Least damage survived in a round" }
 };
 
@@ -220,6 +257,10 @@ const getRandom = function (array) {
     return array[Math.floor(Math.random() * array.length)];
 };
 
+const getRandomCombination = function () {
+    return getRandom(getRandom(COMBINATIONS));
+};
+
 const getPermutations = function (array) {
     if (array.length === 0)
         return [[]];
@@ -249,4 +290,4 @@ const getPermutation = function (combination) {
 
 
 
-export { COMBINATIONS, ITEMS, getMatch, writeScores, clearHistory, readSettings, writeSettings, resetSettings, readStats, writeStats, resetStats, getRandom, getPermutation };
+export { COMBINATIONS, ITEMS, getRandomCombination, getMatch, writeScores, clearHistory, readSettings, writeSettings, resetSettings, readStats, writeStats, resetStats, getRandom, getPermutation };

@@ -1,16 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="Assets/Icons/game.svg">
     <link rel="stylesheet" href="CSS/styles.css">
     <link rel="stylesheet" href="CSS/game.css">
-
-    <script type="module" src="JS/game.js"></script>
     <title>Match - Buckshot Roulette</title>
 </head>
+
 <body>
-    
+
+    <header class="match-header">
+        <a href="index.html" class="back-link" id="quitLink">‹ Quit</a>
+
+        <div class="scoreboard">
+            <span class="score-name" id="scoreP1Name">P1</span>
+            <span class="score-val" id="scoreP1Val">0</span>
+            <span class="score-sep">—</span>
+            <span class="score-val" id="scoreP2Val">0</span>
+            <span class="score-name" id="scoreP2Name">P2</span>
+        </div>
+
+        <button type="button" id="endMatchBtn" class="end-match-btn">End Match</button>
+    </header>
+
+    <div id="turnBanner" class="turn-banner">Loading…</div>
+
+    <main class="board">
+
+        <!-- ============ PLAYER 1 ============ -->
+        <section class="player-column" id="p1Column" data-player="p1">
+            <div class="player-heading">
+                <span class="player-dot" id="p1Dot"></span>
+                <h2 id="p1NameLabel">Player 1</h2>
+            </div>
+
+            <div class="panel table-panel">
+                <h3>Table</h3>
+                <div class="item-grid" id="p1Table"></div>
+            </div>
+
+            <div class="panel inventory-panel">
+                <h3>Inventory</h3>
+                <div class="item-grid" id="p1Inventory"></div>
+            </div>
+
+            <div class="health-panel">
+                <span class="health-label">Health</span>
+                <div class="health-pips" id="p1Health"></div>
+            </div>
+        </section>
+
+        <!-- ============ PLAYER 1 ACTIONS ============ -->
+        <section class="actions-panel" id="p1Actions" data-player="p1">
+            <span class="chained-badge">⛓️ Chained</span>
+            <button type="button" class="action-btn shoot-self" id="p1ShootSelf">
+                <span class="action-icon">🔫</span> Shoot Self
+            </button>
+            <button type="button" class="action-btn shoot-opponent" id="p1ShootOpponent">
+                <span class="action-icon">🎯</span> Shoot Opponent
+            </button>
+        </section>
+
+        <!-- ============ CENTER ============ -->
+        <section class="center-column">
+            <div class="chamber-wrap">
+                <div class="chamber-pips" id="chamberPips"></div>
+                <div class="shotgun-aim" id="shotgunAim">
+                    <img src="Assets/shotgun.svg" alt="" class="center-shotgun" id="shotgunArt">
+                </div>
+            </div>
+
+            <div class="reveal-banner" id="revealBanner"></div>
+
+            <div class="replace-banner" id="replaceBanner" hidden>
+                <span id="replaceText">Inventory full — choose an item to replace</span>
+                <button type="button" id="cancelReplaceBtn">Cancel</button>
+            </div>
+
+            <ul class="log-feed" id="logFeed"></ul>
+        </section>
+
+        <!-- ============ PLAYER 2 ACTIONS ============ -->
+        <section class="actions-panel" id="p2Actions" data-player="p2">
+            <span class="chained-badge">⛓️ Chained</span>
+            <button type="button" class="action-btn shoot-opponent" id="p2ShootOpponent">
+                <span class="action-icon">🎯</span> Shoot Opponent
+            </button>
+            <button type="button" class="action-btn shoot-self" id="p2ShootSelf">
+                <span class="action-icon">🔫</span> Shoot Self
+            </button>
+        </section>
+
+        <!-- ============ PLAYER 2 ============ -->
+        <section class="player-column" id="p2Column" data-player="p2">
+            <div class="player-heading">
+                <h2 id="p2NameLabel">Player 2</h2>
+                <span class="player-dot" id="p2Dot"></span>
+            </div>
+
+            <div class="panel table-panel">
+                <h3>Table</h3>
+                <div class="item-grid" id="p2Table"></div>
+            </div>
+
+            <div class="panel inventory-panel">
+                <h3>Inventory</h3>
+                <div class="item-grid" id="p2Inventory"></div>
+            </div>
+
+            <div class="health-panel">
+                <span class="health-label">Health</span>
+                <div class="health-pips" id="p2Health"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============ ROUND OVER ============ -->
+    <div class="overlay" id="roundOverOverlay" hidden>
+        <div class="overlay-card">
+            <h2 id="roundOverTitle">Round Over</h2>
+            <p id="roundOverText"></p>
+            <button type="button" id="nextRoundBtn">Next Round</button>
+        </div>
+    </div>
+
+    <!-- ============ MATCH OVER ============ -->
+    <div class="overlay" id="matchOverOverlay" hidden>
+        <div class="overlay-card">
+            <h2>Match Saved</h2>
+            <p id="matchOverText"></p>
+            <div class="overlay-actions">
+                <button type="button" id="playAgainBtn">Play Again</button>
+                <a href="index.html" class="overlay-link">Back to Menu</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="JS/game.js"></script>
+
 </body>
+
 </html>

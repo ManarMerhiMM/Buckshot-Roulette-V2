@@ -11,6 +11,10 @@ const p2NameInput = document.getElementById("p2Name");
 
 const errorMessage = document.getElementById("errorMessage");
 
+
+const MAX_HEALTH = 10;
+const MAX_ITEMS = 10;
+
 const loadSettings = function () {
     const settings = readSettings();
 
@@ -28,6 +32,12 @@ const loadSettings = function () {
 loadSettings();
 
 
+const showError = function (msg) {
+    errorMessage.textContent = msg;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+
 document.getElementById("saveSettingsBtn").addEventListener("click", () => {
     errorMessage.textContent = "";
 
@@ -38,68 +48,51 @@ document.getElementById("saveSettingsBtn").addEventListener("click", () => {
     const p1Name = p1NameInput.value.trim();
     const p2Name = p2NameInput.value.trim();
 
+    // 1. Are the numbers even numbers?
     if ([minHealth, maxHealth, minItems, maxItems].some(v => isNaN(v))) {
-        errorMessage.textContent = "Please enter valid numbers for all settings.";
-        return;
+        return showError("Please enter valid numbers for all settings.");
     }
 
+    // 2. Individual bounds — catch out-of-range values before comparing them to each other
     if (minHealth < 1 || maxHealth < 1) {
-        errorMessage.textContent = "Health must be at least 1.";
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-        return;
+        return showError("Health must be at least 1.");
+    }
+
+    if (maxHealth > MAX_HEALTH) {
+        return showError(`Maximum health is ${MAX_HEALTH}.`);
     }
 
     if (minItems < 0 || maxItems < 0) {
-        errorMessage.textContent = "Items cannot be negative.";
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-        return;
+        return showError("Items cannot be negative.");
     }
 
+    if (maxItems > MAX_ITEMS) {
+        return showError(`Maximum number of items is ${MAX_ITEMS}.`);
+    }
+
+    // 3. Relational checks — now that each value is individually valid
     if (minHealth > maxHealth) {
-        errorMessage.textContent = "Minimum health cannot be greater than maximum health.";
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-        return;
+        return showError("Minimum health cannot be greater than maximum health.");
     }
 
     if (minItems > maxItems) {
-        errorMessage.textContent = "Minimum items cannot be greater than maximum items.";
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-        return;
+        return showError("Minimum items cannot be greater than maximum items.");
     }
 
+    // 4. Players
     if (!p1Name || !p2Name) {
-        {
-            errorMessage.textContent = "Must enter a name for each player.";
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-            return;
-        }
+        return showError("Must enter a name for each player.");
     }
 
     if (p1Name.toLowerCase() === p2Name.toLowerCase()) {
-        errorMessage.textContent = "The 2 players cannot have the same name (case-insensitive).";
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-        return;
+        return showError("The 2 players cannot have the same name (case-insensitive).");
     }
 
-    
+    if (p1ColorInput.value === p2ColorInput.value) {
+        return showError("The 2 players cannot have the same color.");
+    }
+
+    // 5. Confirm and persist
     if (!confirm("Are you sure you want to save these settings?")) {
         return;
     }
@@ -115,12 +108,7 @@ document.getElementById("saveSettingsBtn").addEventListener("click", () => {
         p2Name: p2Name
     });
 
-    errorMessage.textContent = "Successfully saved edits!";
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
+    showError("Successfully saved edits!");
 });
 
 document.getElementById("resetSettingsBtn").addEventListener("click", () => {
@@ -131,10 +119,5 @@ document.getElementById("resetSettingsBtn").addEventListener("click", () => {
     resetSettings();
     loadSettings();
 
-    errorMessage.textContent = "Settings have been reset!";
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
+    showError("Settings have been reset!");
 });
