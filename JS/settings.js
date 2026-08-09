@@ -15,6 +15,34 @@ const errorMessage = document.getElementById("errorMessage");
 const MAX_HEALTH = 10;
 const MAX_ITEMS = 10;
 
+// ---------- SFX ----------
+// Each key holds an array of paths — playSfx picks one at random
+const SFX = {
+    success: ["Assets/SFX/settings-success.mp3"],
+    error: ["Assets/SFX/settings-error.mp3"]
+};
+
+const getRandom = function (array) {
+    return array[Math.floor(Math.random() * array.length)];
+};
+
+const playSfx = function (key) {
+    const variants = SFX[key];
+    if (!variants || variants.length === 0) return;
+
+    const src = getRandom(variants);
+
+    try {
+        const audio = new Audio(src);
+        audio.volume = 0.7;
+        audio.play().catch(() => { /* autoplay blocked or file missing — ignore */ });
+    }
+    catch {
+        // ignore
+    }
+};
+
+
 const loadSettings = function () {
     const settings = readSettings();
 
@@ -32,9 +60,19 @@ const loadSettings = function () {
 loadSettings();
 
 
-const showError = function (msg) {
+const setMessage = function (msg) {
     errorMessage.textContent = msg;
     window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+const showError = function (msg) {
+    setMessage(msg);
+    playSfx("error");
+};
+
+const showSuccess = function (msg) {
+    setMessage(msg);
+    playSfx("success");
 };
 
 
@@ -108,7 +146,7 @@ document.getElementById("saveSettingsBtn").addEventListener("click", () => {
         p2Name: p2Name
     });
 
-    showError("Successfully saved edits!");
+    showSuccess("Successfully saved edits!");
 });
 
 document.getElementById("resetSettingsBtn").addEventListener("click", () => {
@@ -119,5 +157,5 @@ document.getElementById("resetSettingsBtn").addEventListener("click", () => {
     resetSettings();
     loadSettings();
 
-    showError("Settings have been reset!");
+    showSuccess("Settings have been reset!");
 });

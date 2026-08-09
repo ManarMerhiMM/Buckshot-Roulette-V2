@@ -10,6 +10,35 @@ const p2Header = document.getElementById("p2Header");
 const matchHistoryContainer = document.getElementById("matchHistoryBody");
 const clearHistoryBtn = document.getElementById("clearHistoryBtn");
 
+// ---------- SFX ----------
+// Each key holds an array of paths — playSfx picks one at random
+const SFX = {
+    found: ["Assets/SFX/history-found.mp3"],
+    notFound: ["Assets/SFX/history-not-found.mp3"],
+    cleared: ["Assets/SFX/history-cleared.mp3"]
+};
+
+const getRandom = function (array) {
+    return array[Math.floor(Math.random() * array.length)];
+};
+
+const playSfx = function (key) {
+    const variants = SFX[key];
+    if (!variants || variants.length === 0) return;
+
+    const src = getRandom(variants);
+
+    try {
+        const audio = new Audio(src);
+        audio.volume = 0.7;
+        audio.play().catch(() => { /* autoplay blocked or file missing — ignore */ });
+    }
+    catch {
+        // ignore
+    }
+};
+
+
 historyForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
@@ -19,12 +48,14 @@ historyForm.addEventListener("submit", (event) => {
     if (!p1 || !p2) {
         errorMessageEl.textContent = "Please provide the names of both players!";
         matchHistoryContainer.innerHTML = "";
+        playSfx("notFound");
         return;
     }
 
     if (p1.toLowerCase() === p2.toLowerCase()) {
-        errorMessageEl.textContent = "Please enter two different player names.";
+        errorMessageEl.textContent = "Please enter two different player names (case-insensitive).";
         matchHistoryContainer.innerHTML = "";
+        playSfx("notFound");
         return;
     }
 
@@ -33,6 +64,7 @@ historyForm.addEventListener("submit", (event) => {
     if (!results) {
         errorMessageEl.textContent = "No history found between these two";
         matchHistoryContainer.innerHTML = "";
+        playSfx("notFound");
         return;
     }
 
@@ -61,6 +93,7 @@ historyForm.addEventListener("submit", (event) => {
     }
 
     matchHistoryContainer.innerHTML = rows;
+    playSfx("found");
 });
 
 
@@ -71,20 +104,23 @@ clearHistoryBtn.addEventListener("click", () => {
     if (!p1 || !p2) {
         errorMessageEl.textContent = "Please provide the names of both players!";
         matchHistoryContainer.innerHTML = "";
+        playSfx("notFound");
         return;
     }
 
     if (p1.toLowerCase() === p2.toLowerCase()) {
-        errorMessageEl.textContent = "Please enter two different player names.";
+        errorMessageEl.textContent = "Please enter two different player names (case-insensitive).";
         matchHistoryContainer.innerHTML = "";
+        playSfx("notFound");
         return;
     }
 
-    
+
     if (!confirm(`Are you sure you want to clear ${p1} and ${p2} history?!`))
         return;
 
     clearHistory(p1, p2);
     errorMessageEl.textContent = `Successfully cleared ${p1} and ${p2} history!`;
     matchHistoryContainer.innerHTML = "";
+    playSfx("cleared");
 });

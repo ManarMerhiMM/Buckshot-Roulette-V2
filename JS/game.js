@@ -672,38 +672,38 @@ const ITEM_SFX_KEY = {
 // autoplay just fails silently, it never breaks the game.
 const SFX = {
     // SHOOTING
-    shootSelf: "Assets/SFX/shoot-self.mp3",
-    shootOpponent: "Assets/SFX/shoot-opponent.mp3",
+    shootSelf: ["Assets/SFX/shoot-self.mp3"],
+    shootOpponent: ["Assets/SFX/shoot-opponent.mp3"],
 
     // Triggered by the actual shell
-    liveShot: "Assets/SFX/live-shot.mp3",
-    sawedShot: "Assets/SFX/sawed-shot.mp3",
-    blankShot: "Assets/SFX/blank-shot.mp3",
+    liveShot: ["Assets/SFX/live-shot.mp3", "Assets/SFX/live-shot2.mp3", "Assets/SFX/live-shot3.mp3"],
+    sawedShot: ["Assets/SFX/sawed-shot.mp3"],
+    blankShot: ["Assets/SFX/blank-shot.mp3"],
 
     // SHOTGUN
-    reload: "Assets/SFX/reload.mp3",
-    reloadShell: "Assets/SFX/reload-shell.mp3",
+    reload: ["Assets/SFX/reload.mp3"],
+    reloadShell: ["Assets/SFX/reload-shell.mp3"],
 
     // ITEMS
-    itemPickup: "Assets/SFX/item-pickup.mp3",
-    itemSwap: "Assets/SFX/item-swap.mp3",
+    itemPickup: ["Assets/SFX/item-pickup.mp3"],
+    itemSwap: ["Assets/SFX/item-swap.mp3"],
 
-    saw: "Assets/SFX/saw.mp3",
-    smoke: "Assets/SFX/smoke.mp3",
-    lens: "Assets/SFX/lens.mp3",
-    phone: "Assets/SFX/phone.mp3",
-    beer: "Assets/SFX/beer.mp3",
-    pillGood: "Assets/SFX/pill-good.mp3",
-    pillBad: "Assets/SFX/pill-bad.mp3",
-    inverter: "Assets/SFX/inverter.mp3",
+    saw: ["Assets/SFX/saw.mp3"],
+    smoke: ["Assets/SFX/smoke.mp3"],
+    lens: ["Assets/SFX/lens.mp3"],
+    phone: ["Assets/SFX/phone.mp3"],
+    beer: ["Assets/SFX/beer.mp3"],
+    pillGood: ["Assets/SFX/pill-good.mp3", "Assets/SFX/pill-good2.mp3"],
+    pillBad: ["Assets/SFX/pill-bad.mp3", "Assets/SFX/pill-bad2.mp3"],
+    inverter: ["Assets/SFX/inverter.mp3"],
 
     // CHAINS
-    chainApplied: "Assets/SFX/chain-applied.mp3",
-    chainBroken: "Assets/SFX/chain-broken.mp3",
+    chainApplied: ["Assets/SFX/chain-applied.mp3"],
+    chainBroken: ["Assets/SFX/chain-broken.mp3"],
 
     // ROUND / MATCH
-    roundWin: "Assets/SFX/round-win.mp3",
-    matchEnd: "Assets/SFX/match-end.mp3"
+    roundWin: ["Assets/SFX/round-win.mp3", "Assets/SFX/round-win2.mp3", "Assets/SFX/round-win3.mp3", "Assets/SFX/round-win4.mp3", "Assets/SFX/round-win5.mp3", "Assets/SFX/round-win6.mp3"],
+    matchEnd: ["Assets/SFX/match-end.mp3", "Assets/SFX/match-end2.mp3"]
 };
 
 const combinationText = function () {
@@ -714,8 +714,10 @@ const combinationText = function () {
 };
 
 const playSfx = function (key) {
-    const src = SFX[key];
-    if (!src) return;
+    const variants = SFX[key];
+    if (!variants || variants.length === 0) return;
+
+    const src = getRandom(variants);
 
     try {
         const audio = new Audio(src);
@@ -910,17 +912,11 @@ const showBanner = function (text, ms) {
 const handleEffectUI = function (effect) {
     switch (effect.type) {
         case "reveal":
-            if (effect.position === null) {
-                revealedShell = null;
-                showBanner("📱 No other shells left to check.", 4000);
-            }
-            else {
-                revealedShell = { position: effect.position, isLive: effect.isLive };
-                showBanner(
-                    effect.isLive ? "👁️ Revealed: LIVE round ahead." : "👁️ Revealed: blank round ahead.",
-                    6000
-                );
-            }
+            revealedShell = { position: effect.position, isLive: effect.isLive };
+            showBanner(
+                effect.isLive ? "👁️ Revealed: LIVE round ahead." : "👁️ Revealed: blank round ahead.",
+                6000
+            );
             break;
 
         case "saw":
@@ -976,7 +972,6 @@ const formatItemLog = function (slot, item, effect) {
     switch (effect.type) {
         case "saw": return `🪚 ${name} loads the saw.`;
         case "reveal":
-            if (effect.position === null) return `📱 ${name} checks the phone — nothing left to find.`;
             return `🔍 ${name} checks a shell — it's ${effect.isLive ? "💥 LIVE" : "🎭 blank"}.`;
         case "rack": return `🍺 ${name} racks a ${effect.isLive ? "💥 LIVE" : "🎭 blank"} shell out.`;
         case "heal": return `🚬 ${name} heals ${effect.amount} HP.`;
