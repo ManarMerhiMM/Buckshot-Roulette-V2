@@ -1,4 +1,4 @@
-import { getMatch, clearHistory } from "./utility.js";
+import { getMatch, clearHistory, getRandom } from "./utility.js";
 
 
 const historyForm = document.getElementById("historyForm");
@@ -16,10 +16,6 @@ const SFX = {
     found: ["Assets/SFX/history-found.mp3"],
     notFound: ["Assets/SFX/history-not-found.mp3"],
     cleared: ["Assets/SFX/history-cleared.mp3"]
-};
-
-const getRandom = function (array) {
-    return array[Math.floor(Math.random() * array.length)];
 };
 
 const playSfx = function (key) {

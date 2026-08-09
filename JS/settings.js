@@ -1,4 +1,4 @@
-import { readSettings, writeSettings, resetSettings } from "./utility.js";
+import { readSettings, writeSettings, resetSettings, getRandom } from "./utility.js";
 
 const minHealthInput = document.getElementById("minHealth");
 const maxHealthInput = document.getElementById("maxHealth");
@@ -19,11 +19,8 @@ const MAX_ITEMS = 10;
 // Each key holds an array of paths — playSfx picks one at random
 const SFX = {
     success: ["Assets/SFX/settings-success.mp3"],
-    error: ["Assets/SFX/settings-error.mp3"]
-};
-
-const getRandom = function (array) {
-    return array[Math.floor(Math.random() * array.length)];
+    error: ["Assets/SFX/settings-error.mp3"],
+    reset: ["Assets/SFX/history-cleared.mp3"]
 };
 
 const playSfx = function (key) {
@@ -70,9 +67,13 @@ const showError = function (msg) {
     playSfx("error");
 };
 
-const showSuccess = function (msg) {
+const showSuccess = function (msg, successType) {
     setMessage(msg);
-    playSfx("success");
+
+    if(successType)
+        playSfx("success");
+    else
+        playSfx("reset");
 };
 
 
@@ -146,7 +147,7 @@ document.getElementById("saveSettingsBtn").addEventListener("click", () => {
         p2Name: p2Name
     });
 
-    showSuccess("Successfully saved edits!");
+    showSuccess("Successfully saved edits!", true);
 });
 
 document.getElementById("resetSettingsBtn").addEventListener("click", () => {
@@ -157,5 +158,5 @@ document.getElementById("resetSettingsBtn").addEventListener("click", () => {
     resetSettings();
     loadSettings();
 
-    showSuccess("Settings have been reset!");
+    showSuccess("Settings have been reset!", false);
 });

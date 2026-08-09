@@ -1,9 +1,32 @@
-import { readStats, resetStats } from "./utility.js";
+import { readStats, resetStats, getRandom } from "./utility.js";
 
 const achievementsSection = document.getElementById("achievementsSection");
 
 let tooltipEl = null;
 let activeLabel = null;
+
+// ---------- SFX ----------
+// Each key holds an array of paths — playSfx picks one at random.
+const SFX = {
+    cleared: ["Assets/SFX/history-cleared.mp3"]
+};
+
+const playSfx = function (key) {
+    const variants = SFX[key];
+    if (!variants || variants.length === 0) return;
+
+    const src = getRandom(variants);
+
+    try {
+        const audio = new Audio(src);
+        audio.volume = 0.7;
+        audio.play().catch(() => { /* autoplay blocked or file missing — ignore */ });
+    }
+    catch {
+        // ignore
+    }
+};
+
 
 const formatRecord = function (record) {
     if (record.players.length === 0) {
@@ -217,6 +240,7 @@ document.getElementById("resetStatsBtn").addEventListener("click", () => {
     resetStats();
     renderStats();
     hideTooltip();
+    playSfx("cleared");
 
     window.scrollTo({
         top: 0,
