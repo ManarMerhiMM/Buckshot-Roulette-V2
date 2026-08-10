@@ -324,6 +324,47 @@ body {
     filter: drop-shadow(0 0 5px color-mix(in srgb, var(--player-color) 65%, transparent));
 }
 
+
+/* ---------- Bomb Arming ---------- */
+
+.landmine-badge {
+    display: none;
+    width: 100%;
+    text-align: center;
+
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+
+    color: var(--blood-hot);
+    border: 1px solid color-mix(in srgb, var(--blood-hot) 45%, transparent);
+    border-radius: 4px;
+    padding: 8px 12px;
+
+    background: rgba(226, 66, 42, 0.08);
+}
+
+.landmine-badge.armed {
+    display: block;
+    animation: landmine-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes landmine-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 0 rgba(226, 66, 42, 0);
+    }
+
+    50% {
+        opacity: 0.65;
+        box-shadow: 0 0 14px -4px rgba(226, 66, 42, 0.7);
+    }
+}
+
 /* ---------- Actions panel ---------- */
 
 .actions-panel {
@@ -795,6 +836,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
 
+    .landmine-badge,
     .shotgun-aim,
     .turn-banner,
     .center-shotgun.firing,

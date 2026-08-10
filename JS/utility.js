@@ -48,26 +48,43 @@ const COMBINATIONS = [
 ];
 
 const ITEMS = [
-    "saw",
-    "saw",
-    "saw",
+    // 16%
+    "saw", "saw", "saw", "saw", "saw", "saw", "saw", "saw",
+    "saw", "saw", "saw", "saw", "saw", "saw", "saw", "saw",
+
+    // 16%
+    "beer", "beer", "beer", "beer", "beer", "beer", "beer", "beer",
+    "beer", "beer", "beer", "beer", "beer", "beer", "beer", "beer",
+
+
+    // 16%
+    "deadly pill", "deadly pill", "deadly pill", "deadly pill",
+    "deadly pill", "deadly pill", "deadly pill", "deadly pill",
+    "deadly pill", "deadly pill", "deadly pill", "deadly pill",
+    "deadly pill", "deadly pill", "deadly pill", "deadly pill",
+
+    // 16%
+    "inverter", "inverter", "inverter", "inverter", "inverter", "inverter",
+    "inverter", "inverter", "inverter", "inverter", "inverter", "inverter",
+    "inverter", "inverter", "inverter", "inverter",
+
+    // 10%
+    "smoke", "smoke", "smoke", "smoke", "smoke",
+    "smoke", "smoke", "smoke", "smoke", "smoke",
+
+    // 7%
+    "phone", "phone", "phone", "phone", "phone", "phone", "phone",
+
+    // 7%
+    "magnifying lens", "magnifying lens", "magnifying lens",
+    "magnifying lens", "magnifying lens", "magnifying lens",
     "magnifying lens",
-    "magnifying lens",
-    "phone",
-    "phone",
-    "beer",
-    "beer",
-    "beer",
-    "smoke",
-    "smoke",
-    "deadly pill",
-    "deadly pill",
-    "deadly pill",
-    "chains",
-    "chains",
-    "chains",
-    "inverter",
-    "inverter"
+
+    // 6%
+    "chains", "chains", "chains", "chains", "chains", "chains",
+
+    // 6%
+    "landmine", "landmine", "landmine", "landmine", "landmine", "landmine"
 ];
 
 const DEFAULTSTATS = {
@@ -81,7 +98,8 @@ const DEFAULTSTATS = {
         smoke: 0,
         deadlyPill: 0,
         chains: 0,
-        inverter: 0
+        inverter: 0,
+        landmine: 0
     },
 
     longestLiveStreak: { val: 0, players: [], description: "Longest consecutive sequence of live bullets" },
@@ -106,6 +124,7 @@ const DEFAULTSTATS = {
     mostChainUses: { val: 0, players: [], description: "Most chains used in one round" },
     mostSmokeUses: { val: 0, players: [], description: "Most smokes used in one round" },
     mostDeadlyPillUses: { val: 0, players: [], description: "Most deadly pills used in one round" },
+    mostLandmineUses: { val: 0, players: [], description: "Most landmines used in one round" },
     leastDamageSurvived: { val: 0, players: [], description: "Least damage survived in a round" }
 };
 
@@ -120,26 +139,41 @@ const DEFAULTSETTINGS = {
     p2Name: "Player 2"
 };
 
+// Dynamic on read: merges whatever is actually in localStorage against
+// the CURRENT defaults, one level deep for stats/settings, and one
+// level deeper still for itemFrequencies (the one nested object whose
+// inside can grow when a new item is added). This is what lets old
+// players' localStorage stay compatible after new achievements,
+// settings, or items get added — nothing else needs to change per
+// addition, since every write goes through getData() first too.
 const getData = function () {
-    const raw = localStorage.getItem(BUCKSHOTROULETTE);
+    const fallback = {
+        matches: [],
+        stats: structuredClone(DEFAULTSTATS),
+        settings: structuredClone(DEFAULTSETTINGS)
+    };
 
-    if (!raw) {
-        return {
-            matches: [],
-            stats: structuredClone(DEFAULTSTATS),
-            settings: structuredClone(DEFAULTSETTINGS)
-        };
-    }
+    const raw = localStorage.getItem(BUCKSHOTROULETTE);
+    if (!raw) return fallback;
 
     try {
-        return JSON.parse(raw);
+        const data = JSON.parse(raw);
+
+        return {
+            matches: data.matches ?? [],
+            settings: { ...fallback.settings, ...data.settings },
+            stats: {
+                ...fallback.stats,
+                ...data.stats,
+                itemFrequencies: {
+                    ...fallback.stats.itemFrequencies,
+                    ...data.stats?.itemFrequencies
+                }
+            }
+        };
     }
     catch {
-        return {
-            matches: [],
-            stats: structuredClone(DEFAULTSTATS),
-            settings: structuredClone(DEFAULTSETTINGS)
-        };
+        return fallback;
     }
 };
 

@@ -30,7 +30,8 @@ const GAMESTATE = {
 
     shotgun: {
         chamber: [],
-        sawedOff: false
+        sawedOff: false,
+        landmineArmed: false
     }
 };
 
@@ -42,7 +43,8 @@ const ITEM_KEYS = {
     "smoke": "smoke",
     "deadly pill": "deadlyPill",
     "chains": "chains",
-    "inverter": "inverter"
+    "inverter": "inverter",
+    "landmine": "landmine"
 };
 
 // Settings are frozen at match start so mid-match edits (another tab)
@@ -63,7 +65,7 @@ const DEFAULT_ROUND_TRACKER = {
         healing: 0,
         damageTaken: 0,
         maxDeficit: 0,
-        items: { saw: 0, magnifyingLens: 0, phone: 0, beer: 0, smoke: 0, deadlyPill: 0, chains: 0, inverter: 0 },
+        items: { saw: 0, magnifyingLens: 0, phone: 0, beer: 0, smoke: 0, deadlyPill: 0, chains: 0, inverter: 0, landmine: 0 },
         selfShotStreak: 0, selfShotBest: 0,
         turnsOn1HP: 0, turnsOn1HPBest: 0,
         maxItemsHeld: 0,
@@ -75,7 +77,7 @@ const DEFAULT_ROUND_TRACKER = {
         healing: 0,
         damageTaken: 0,
         maxDeficit: 0,
-        items: { saw: 0, magnifyingLens: 0, phone: 0, beer: 0, smoke: 0, deadlyPill: 0, chains: 0, inverter: 0 },
+        items: { saw: 0, magnifyingLens: 0, phone: 0, beer: 0, smoke: 0, deadlyPill: 0, chains: 0, inverter: 0, landmine: 0 },
         selfShotStreak: 0, selfShotBest: 0,
         turnsOn1HP: 0, turnsOn1HPBest: 0,
         maxItemsHeld: 0,
@@ -95,7 +97,8 @@ const DEFAULT_STAT_TRACKER = {
         smoke: 0,
         deadlyPill: 0,
         chains: 0,
-        inverter: 0
+        inverter: 0,
+        landmine: 0
     },
 
     longestLiveStreak: { val: 0, players: [] },
@@ -120,6 +123,7 @@ const DEFAULT_STAT_TRACKER = {
     mostChainUses: { val: 0, players: [] },
     mostSmokeUses: { val: 0, players: [] },
     mostDeadlyPillUses: { val: 0, players: [] },
+    mostLandmineUses: { val: 0, players: [] },
     leastDamageSurvived: { val: 0, players: [] }
 };
 
@@ -219,6 +223,7 @@ const startRound = function () {
 
     GAMESTATE.shotgun.chamber = getPermutation(getRandomCombination());
     GAMESTATE.shotgun.sawedOff = false;
+    GAMESTATE.shotgun.landmineArmed = false;
 
     GAMESTATE.players.p1.chained = false;
     GAMESTATE.players.p2.chained = false;
@@ -238,6 +243,7 @@ const reloadShotgun = function () {
     GAMESTATE.players.p2.table = drawItems(itemCount);
 
     // health, inventorySpace, items, and turn all carry over untouched
+    // — a planted (but not yet triggered) landmine also carries over
 };
 
 const endRound = function (loser) {
@@ -281,6 +287,7 @@ const endRound = function (loser) {
         promote("mostChainUses", r.items.chains, name);
         promote("mostSmokeUses", r.items.smoke, name);
         promote("mostDeadlyPillUses", r.items.deadlyPill, name);
+        promote("mostLandmineUses", r.items.landmine, name);
     });
 };
 
@@ -300,7 +307,8 @@ const updateStats = function () {
         "biggestHPDeficitOvercome", "consecutiveTurnsNoItem", "mostItemsHeld",
         "slowestRound", "mostConsecutiveNoCheck", "mostHealing",
         "mostInvertedUses", "mostBeerUses", "mostLensUses",
-        "mostPhoneUses", "mostSawUses", "mostChainUses", "mostSmokeUses", "mostDeadlyPillUses"
+        "mostPhoneUses", "mostSawUses", "mostChainUses", "mostSmokeUses",
+        "mostDeadlyPillUses", "mostLandmineUses"
     ];
 
     higherIsBetter.forEach(key => {
@@ -379,6 +387,9 @@ const fireShell = function (targetSlot) {
 //  ITEMS
 // ============================================================
 
+// Damage dealt to whoever's item use triggers an armed landmine.
+const LANDMINE_DAMAGE = 2;
+
 const useItem = function (player, itemIndex) {
     const p = GAMESTATE.players[player];
     const item = p.items[itemIndex];
@@ -387,7 +398,17 @@ const useItem = function (player, itemIndex) {
     if (GAMESTATE.shotgun.chamber.length === 0) return null;
 
     const idx = nextShellIndex();
-    const result = { player, item, effect: null };
+    const result = { player, item, effect: null, mineTriggered: false, mineDamage: 0 };
+
+    // Any item use — including planting a second landmine — detonates
+    // an already-armed one first. The triggering item's own effect
+    // (below) still applies normally on top of the mine's damage.
+    if (GAMESTATE.shotgun.landmineArmed) {
+        GAMESTATE.shotgun.landmineArmed = false;
+
+        result.mineTriggered = true;
+        result.mineDamage = LANDMINE_DAMAGE;
+    }
 
     switch (item) {
         case "saw":
@@ -445,6 +466,11 @@ const useItem = function (player, itemIndex) {
         case "inverter":
             GAMESTATE.shotgun.chamber[idx] = !GAMESTATE.shotgun.chamber[idx];
             result.effect = { type: "invert" };
+            break;
+
+        case "landmine":
+            GAMESTATE.shotgun.landmineArmed = true;
+            result.effect = { type: "landmine" };
             break;
 
         default:
@@ -584,8 +610,13 @@ const trackItemUse = function (player, item, effect) {
         r.healing += effect.amount;
     }
 
-    if (effect && effect.type === "pill" && effect.change > 0) {
-        r.healing += effect.change;
+    if (effect && effect.type === "pill") {
+        if (effect.change > 0) {
+            r.healing += effect.change;
+        }
+        else if (effect.change < 0) {
+            r.damageTaken += Math.abs(effect.change);
+        }
     }
 
     ROUND_TRACKER.noCheckStreak = 0;
@@ -640,7 +671,8 @@ const ITEM_EMOJI = {
     "smoke": "🚬",
     "deadly pill": "💊",
     "chains": "⛓️",
-    "inverter": "🔄"
+    "inverter": "🔄",
+    "landmine": "💣"
 };
 
 const ITEM_LABELS = {
@@ -651,7 +683,8 @@ const ITEM_LABELS = {
     "smoke": "Smoke",
     "deadly pill": "Deadly Pill",
     "chains": "Chains",
-    "inverter": "Inverter"
+    "inverter": "Inverter",
+    "landmine": "Landmine"
 };
 
 // Only items with ONE deterministic activation sound live here.
@@ -664,7 +697,8 @@ const ITEM_SFX_KEY = {
     "phone": "phone",
     "beer": "beer",
     "smoke": "smoke",
-    "inverter": "inverter"
+    "inverter": "inverter",
+    "landmine": "landminePlant"
 };
 
 // ---------- SFX ----------
@@ -696,6 +730,8 @@ const SFX = {
     pillGood: ["Assets/SFX/pill-good.mp3", "Assets/SFX/pill-good2.mp3"],
     pillBad: ["Assets/SFX/pill-bad.mp3", "Assets/SFX/pill-bad2.mp3"],
     inverter: ["Assets/SFX/inverter.mp3"],
+    landminePlant: ["Assets/SFX/landmine-plant.mp3"],
+    landmineTrigger: ["Assets/SFX/landmine-trigger.mp3"],
 
     // CHAINS
     chainApplied: ["Assets/SFX/chain-applied.mp3"],
@@ -746,6 +782,7 @@ const ROUND_OVER_DELAY_MS = 1000; // let the fatal hit land before the popup + s
 // lengths: shoot-opponent ~1.15s, shoot-self ~1.93s — 1000ms sits
 // close to the shorter of the two; raise/lower freely.
 const SHOT_RESULT_DELAY_MS = 1000;
+const LANDMINE_TRIGGER_DELAY_MS = 1000;
 
 const nameOf = function (slot) {
     return GAMESTATE.players[slot].name || (slot === "p1" ? "Player 1" : "Player 2");
@@ -793,6 +830,13 @@ const renderTurnBanner = function () {
     el.style.setProperty(
         "--player-color",
         slot === "p1" ? MATCH_SETTINGS.p1Color : MATCH_SETTINGS.p2Color
+    );
+};
+
+const renderLandmineIndicator = function () {
+    $("landmineBadge").classList.toggle(
+        "armed",
+        GAMESTATE.shotgun.landmineArmed
     );
 };
 
@@ -895,6 +939,7 @@ const renderAll = function () {
     renderScoreboard();
     renderTurnBanner();
     renderChamber();
+    renderLandmineIndicator();
     renderPlayerPanel("p1");
     renderPlayerPanel("p2");
 };
@@ -951,6 +996,14 @@ const handleEffectUI = function (effect) {
             showBanner(effect.change > 0 ? `💊 Lucky! +${effect.change} HP.` : `💊 Ouch! ${effect.change} HP.`, 4000);
             playSfx(effect.change > 0 ? "pillGood" : "pillBad");
             break;
+
+        case "landmine":
+            showBanner(
+                "💣 A landmine has been planted — the next item used will trigger it!",
+                4500
+            );
+            renderAll();
+            break;
     }
 };
 
@@ -980,6 +1033,7 @@ const formatItemLog = function (slot, item, effect) {
             : `💊 ${name} isn't so lucky — ${effect.change} HP.`;
         case "chain": return `⛓️ ${name} chains ${nameOf(effect.target)}.`;
         case "invert": return `🔄 ${name} inverts the next shell.`;
+        case "landmine": return `💣 ${name} plants a landmine.`;
         default: return `${name} uses an item.`;
     }
 };
@@ -1135,6 +1189,34 @@ const handleShoot = function (shooterSlot, targetSlot) {
     }, SHOT_RESULT_DELAY_MS);
 };
 
+const triggerLandmine = function (result) {
+    if (!result.mineTriggered) return false;
+
+    const player = GAMESTATE.players[result.player];
+
+    playSfx("landmineTrigger");
+
+    player.health = Math.max(
+        0,
+        player.health - result.mineDamage
+    );
+
+    addLog(
+        `💥 ${nameOf(result.player)} triggered a landmine! -${result.mineDamage} HP`
+    );
+
+    showBanner(
+        `💥 Landmine triggered! -${result.mineDamage} HP`,
+        4000
+    );
+
+    trackHealthChange();
+    ROUND_TRACKER[result.player].damageTaken += result.mineDamage;
+    renderAll();
+
+    return player.health === 0;
+};
+
 const handleUseItem = function (slot, idx) {
     if (locked) return;
     if (GAMESTATE.players.turn !== slot) return;
@@ -1145,46 +1227,85 @@ const handleUseItem = function (slot, idx) {
     const result = useItem(slot, idx);
     if (!result) return;
 
+    locked = true;
+    updateLockUI();
+
     trackItemUse(slot, item, result.effect);
     trackHealthChange();
 
-    // Item activation sound (saw/lens/phone/beer/smoke/inverter — one
-    // deterministic sound each). Pill and chains play their own sound
-    // from handleEffectUI below, based on the actual outcome.
+    // The triggering item's sound always happens first.
+    // The landmine, if any, detonates afterward.
     playSfx(ITEM_SFX_KEY[item]);
 
     addLog(formatItemLog(slot, item, result.effect));
     handleEffectUI(result.effect);
 
-    if (result.roundOver) {
-        locked = true;
-        updateLockUI();
-        setTimeout(() => handleRoundOver(result.loser), ROUND_OVER_DELAY_MS);
-        return;
-    }
-
-    if (result.chamberEmpty) {
-        revealedShell = null;
-        locked = true;
-        updateLockUI();
-        renderAll(); // shows the empty chamber before it refills
-
-        setTimeout(() => {
-            reloadShotgun();
-            addLog("🔄 The chamber is empty — reloading…");
-
-            playReloadSequence(GAMESTATE.shotgun.chamber.length, () => {
-                showBanner(combinationText(), 4500);
-                locked = false;
-                updateLockUI();
-                renderAll();
-            });
-        }, RELOAD_DELAY_MS);
-
-        return;
-    }
-
+    // Render the item's effect immediately.
+    // This makes HP changes from Smoke / Deadly Pill visible
+    // before the landmine detonates.
     renderAll();
+
+    const continueAfterMine = function () {
+        let mineKilled = false;
+
+        if (result.mineTriggered) {
+            mineKilled = triggerLandmine(result);
+        }
+
+        // The landmine killed the player.
+        if (mineKilled) {
+            setTimeout(
+                () => handleRoundOver(result.player),
+                ROUND_OVER_DELAY_MS
+            );
+            return;
+        }
+
+        // The item itself killed the player (e.g. Deadly Pill).
+        if (result.roundOver) {
+            setTimeout(
+                () => handleRoundOver(result.loser),
+                ROUND_OVER_DELAY_MS
+            );
+            return;
+        }
+
+        if (result.chamberEmpty) {
+            revealedShell = null;
+            renderAll();
+
+            setTimeout(() => {
+                reloadShotgun();
+                addLog("🔄 The chamber is empty — reloading…");
+
+                playReloadSequence(
+                    GAMESTATE.shotgun.chamber.length,
+                    () => {
+                        showBanner(combinationText(), 4500);
+                        locked = false;
+                        updateLockUI();
+                        renderAll();
+                    }
+                );
+            }, RELOAD_DELAY_MS);
+
+            return;
+        }
+
+        locked = false;
+        updateLockUI();
+        renderAll();
+    };
+
+    if (result.mineTriggered) {
+        setTimeout(
+            continueAfterMine,
+            LANDMINE_TRIGGER_DELAY_MS
+        );
+    }
+    else {
+        continueAfterMine();
+    }
 };
 
 const handleTakeItem = function (slot, tableIndex) {
@@ -1298,13 +1419,12 @@ const setupDelegation = function () {
     $("nextRoundBtn").addEventListener("click", () => {
         $("roundOverOverlay").hidden = true;
         startRound();
-        locked = false;
+        locked = true;
         revealedShell = null;
         chainBadgeHold = null;
         updateLockUI();
         addLog("— New round —");
-        renderAll();
-        showBanner(combinationText(), 4500);
+        playStartupLoadSequence();
     });
 
     $("endMatchBtn").addEventListener("click", () => {

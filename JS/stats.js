@@ -86,6 +86,7 @@ const renderStats = function () {
     document.getElementById("deadlyPillsUsed").textContent = stats.itemFrequencies.deadlyPill;
     document.getElementById("chainsUsed").textContent = stats.itemFrequencies.chains;
     document.getElementById("invertersUsed").textContent = stats.itemFrequencies.inverter;
+    document.getElementById("landminesUsed").textContent = stats.itemFrequencies.landmine;
 
     document.getElementById("longestLiveStreak").innerHTML = formatRecord(stats.longestLiveStreak);
     document.getElementById("liveStreakLabel").dataset.description = stats.longestLiveStreak.description;
@@ -155,6 +156,9 @@ const renderStats = function () {
 
     document.getElementById("leastDamageSurvived").innerHTML = formatRecord(stats.leastDamageSurvived);
     document.getElementById("leastDamageSurvivedLabel").dataset.description = stats.leastDamageSurvived.description;
+
+    document.getElementById("mostLandmineUses").innerHTML = formatRecord(stats.mostLandmineUses);
+    document.getElementById("mostLandmineUsesLabel").dataset.description = stats.mostLandmineUses.description;
 }
 
 

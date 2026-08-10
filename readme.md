@@ -107,10 +107,6 @@ The concept is inspired by [**Buckshot Roulette**](https://store.steampowered.co
 
 ### Match
 ![Match in progress](Assets/Screenshots/game-board.png)
-![Item reveal](Assets/Screenshots/item-reveal.png)
-![Item reveal2](Assets/Screenshots/item-reveal2.png)
-![Round over](Assets/Screenshots/round-over.png)
-![Game over](Assets/Screenshots/game-over.png)
 
 ### Settings
 ![Settings](Assets/Screenshots/settings.png)

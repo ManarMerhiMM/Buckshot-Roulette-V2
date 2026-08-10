@@ -54,10 +54,10 @@ body {
     color: var(--brass);
 }
 
-
-.tagline{
+.tagline {
     font-family: 'Black Ops One', sans-serif;
 }
+
 /* ---------- Content sections ---------- */
 
 .content {
@@ -84,7 +84,7 @@ body {
     color: #c9c4b5;
 }
 
-.content-section p+p {
+.content-section p + p {
     margin-top: 14px;
 }
 
@@ -156,6 +156,16 @@ body {
     line-height: 1;
 }
 
+/* ---------- Item title + probability ---------- */
+
+.item-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
 .item-card h3 {
     font-family: 'Space Mono', monospace;
     font-weight: 700;
@@ -163,7 +173,21 @@ body {
     letter-spacing: 0.05em;
     text-transform: uppercase;
     color: #d8d3c4;
-    margin-bottom: 6px;
+    margin: 0;
+}
+
+.item-probability {
+    flex-shrink: 0;
+    padding: 3px 7px;
+    border: 1px solid var(--brass-dim);
+    border-radius: 2px;
+    color: var(--brass);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    background: rgba(0, 0, 0, 0.25);
 }
 
 .item-card p {
@@ -185,5 +209,12 @@ body {
 
     .item-grid {
         grid-template-columns: 1fr;
+    }
+    .item-probability{
+        font-size: 0.75rem;
+    }
+
+    .item-card-header{
+        margin-bottom: 12px;
     }
 }
