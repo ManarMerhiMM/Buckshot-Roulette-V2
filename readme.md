@@ -11,7 +11,7 @@ Each round loads a randomized chamber of live and blank shells. On your turn, sh
 ## ✨ Features
 
 - **1v1 local pass-and-play** — no accounts, no networking, no AI opponent, by design
-- **8 items** — Saw, Magnifying Lens, Phone, Beer, Smoke, Deadly Pill, Chains, Inverter — each with its own effect, sound, and on-screen log
+- **10 items** — Saw, Magnifying Lens, Phone, Beer, Smoke, Deadly Pill, Chains, Inverter, Landmine, and Defuse Kit — each with its own effect, sound, and on-screen log
 - **Swap-on-full inventory** — picking up an item when your inventory is full lets you choose what to discard in its place
 - **Dynamic chamber generation** — chamber length (2–8 shells) and live/blank split are both randomized, with every length equally likely regardless of how many splits exist within it
 - **Full audio-visual sequencing** — a distinct aim → pause → bang rhythm on every shot, a per-shell reload sequence when the chamber empties, and a mobile-specific vertical aim direction

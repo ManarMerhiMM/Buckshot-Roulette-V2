@@ -87,6 +87,7 @@ const renderStats = function () {
     document.getElementById("chainsUsed").textContent = stats.itemFrequencies.chains;
     document.getElementById("invertersUsed").textContent = stats.itemFrequencies.inverter;
     document.getElementById("landminesUsed").textContent = stats.itemFrequencies.landmine;
+    document.getElementById("defuseKitsUsed").textContent = stats.itemFrequencies.defuseKit;
 
     document.getElementById("longestLiveStreak").innerHTML = formatRecord(stats.longestLiveStreak);
     document.getElementById("liveStreakLabel").dataset.description = stats.longestLiveStreak.description;
@@ -159,6 +160,9 @@ const renderStats = function () {
 
     document.getElementById("mostLandmineUses").innerHTML = formatRecord(stats.mostLandmineUses);
     document.getElementById("mostLandmineUsesLabel").dataset.description = stats.mostLandmineUses.description;
+
+    document.getElementById("mostDefuseKitUses").innerHTML = formatRecord(stats.mostDefuseKitUses);
+    document.getElementById("mostDefuseKitUsesLabel").dataset.description = stats.mostDefuseKitUses.description;
 }
 
 

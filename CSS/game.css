@@ -235,6 +235,20 @@ body {
     opacity: 0.4;
 }
 
+/* Defuse kit held while no landmine is armed: visible but unusable,
+   greyed out until there's actually a mine to defuse. */
+.inventory-slot.inert {
+    cursor: not-allowed;
+    opacity: 0.55;
+    filter: grayscale(0.35);
+}
+
+.inventory-slot.inert:hover,
+.inventory-slot.inert:focus-visible {
+    transform: none;
+    box-shadow: none;
+}
+
 .inventory-panel .item-grid:not(.is-turn) .inventory-slot:not(.empty) {
     opacity: 0.55;
     cursor: not-allowed;

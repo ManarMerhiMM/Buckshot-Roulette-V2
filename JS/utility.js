@@ -47,30 +47,31 @@ const COMBINATIONS = [
     ]
 ];
 
+// Weighted draw pool — one entry per percentage point, so the list is 100 elements long
 const ITEMS = [
-    // 16%
+    // 15%
     "saw", "saw", "saw", "saw", "saw", "saw", "saw", "saw",
-    "saw", "saw", "saw", "saw", "saw", "saw", "saw", "saw",
+    "saw", "saw", "saw", "saw", "saw", "saw", "saw",
 
-    // 16%
+    // 15%
     "beer", "beer", "beer", "beer", "beer", "beer", "beer", "beer",
-    "beer", "beer", "beer", "beer", "beer", "beer", "beer", "beer",
+    "beer", "beer", "beer", "beer", "beer", "beer", "beer",
 
 
-    // 16%
+    // 15%
     "deadly pill", "deadly pill", "deadly pill", "deadly pill",
     "deadly pill", "deadly pill", "deadly pill", "deadly pill",
     "deadly pill", "deadly pill", "deadly pill", "deadly pill",
-    "deadly pill", "deadly pill", "deadly pill", "deadly pill",
+    "deadly pill", "deadly pill", "deadly pill",
 
-    // 16%
-    "inverter", "inverter", "inverter", "inverter", "inverter", "inverter",
-    "inverter", "inverter", "inverter", "inverter", "inverter", "inverter",
-    "inverter", "inverter", "inverter", "inverter",
+    // 15%
+    "inverter", "inverter", "inverter", "inverter", "inverter",
+    "inverter", "inverter", "inverter", "inverter", "inverter",
+    "inverter", "inverter", "inverter", "inverter", "inverter",
 
-    // 10%
-    "smoke", "smoke", "smoke", "smoke", "smoke",
-    "smoke", "smoke", "smoke", "smoke", "smoke",
+    // 8%
+    "smoke", "smoke", "smoke", "smoke",
+    "smoke", "smoke", "smoke", "smoke",
 
     // 7%
     "phone", "phone", "phone", "phone", "phone", "phone", "phone",
@@ -84,7 +85,10 @@ const ITEMS = [
     "chains", "chains", "chains", "chains", "chains", "chains",
 
     // 6%
-    "landmine", "landmine", "landmine", "landmine", "landmine", "landmine"
+    "landmine", "landmine", "landmine", "landmine", "landmine", "landmine",
+
+    // 6%
+    "defuse kit", "defuse kit", "defuse kit", "defuse kit", "defuse kit", "defuse kit"
 ];
 
 const DEFAULTSTATS = {
@@ -99,7 +103,8 @@ const DEFAULTSTATS = {
         deadlyPill: 0,
         chains: 0,
         inverter: 0,
-        landmine: 0
+        landmine: 0,
+        defuseKit: 0
     },
 
     longestLiveStreak: { val: 0, players: [], description: "Longest consecutive sequence of live bullets" },
@@ -125,6 +130,7 @@ const DEFAULTSTATS = {
     mostSmokeUses: { val: 0, players: [], description: "Most smokes used in one round" },
     mostDeadlyPillUses: { val: 0, players: [], description: "Most deadly pills used in one round" },
     mostLandmineUses: { val: 0, players: [], description: "Most landmines used in one round" },
+    mostDefuseKitUses: { val: 0, players: [], description: "Most defuse kits used in one round" },
     leastDamageSurvived: { val: 0, players: [], description: "Least damage survived in a round" }
 };
 

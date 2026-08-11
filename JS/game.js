@@ -44,7 +44,8 @@ const ITEM_KEYS = {
     "deadly pill": "deadlyPill",
     "chains": "chains",
     "inverter": "inverter",
-    "landmine": "landmine"
+    "landmine": "landmine",
+    "defuse kit": "defuseKit"
 };
 
 // Settings are frozen at match start so mid-match edits (another tab)
@@ -65,7 +66,7 @@ const DEFAULT_ROUND_TRACKER = {
         healing: 0,
         damageTaken: 0,
         maxDeficit: 0,
-        items: { saw: 0, magnifyingLens: 0, phone: 0, beer: 0, smoke: 0, deadlyPill: 0, chains: 0, inverter: 0, landmine: 0 },
+        items: { saw: 0, magnifyingLens: 0, phone: 0, beer: 0, smoke: 0, deadlyPill: 0, chains: 0, inverter: 0, landmine: 0, defuseKit: 0 },
         selfShotStreak: 0, selfShotBest: 0,
         turnsOn1HP: 0, turnsOn1HPBest: 0,
         maxItemsHeld: 0,
@@ -77,7 +78,7 @@ const DEFAULT_ROUND_TRACKER = {
         healing: 0,
         damageTaken: 0,
         maxDeficit: 0,
-        items: { saw: 0, magnifyingLens: 0, phone: 0, beer: 0, smoke: 0, deadlyPill: 0, chains: 0, inverter: 0, landmine: 0 },
+        items: { saw: 0, magnifyingLens: 0, phone: 0, beer: 0, smoke: 0, deadlyPill: 0, chains: 0, inverter: 0, landmine: 0, defuseKit: 0 },
         selfShotStreak: 0, selfShotBest: 0,
         turnsOn1HP: 0, turnsOn1HPBest: 0,
         maxItemsHeld: 0,
@@ -98,7 +99,8 @@ const DEFAULT_STAT_TRACKER = {
         deadlyPill: 0,
         chains: 0,
         inverter: 0,
-        landmine: 0
+        landmine: 0,
+        defuseKit: 0
     },
 
     longestLiveStreak: { val: 0, players: [] },
@@ -124,6 +126,7 @@ const DEFAULT_STAT_TRACKER = {
     mostSmokeUses: { val: 0, players: [] },
     mostDeadlyPillUses: { val: 0, players: [] },
     mostLandmineUses: { val: 0, players: [] },
+    mostDefuseKitUses: { val: 0, players: [] },
     leastDamageSurvived: { val: 0, players: [] }
 };
 
@@ -288,6 +291,7 @@ const endRound = function (loser) {
         promote("mostSmokeUses", r.items.smoke, name);
         promote("mostDeadlyPillUses", r.items.deadlyPill, name);
         promote("mostLandmineUses", r.items.landmine, name);
+        promote("mostDefuseKitUses", r.items.defuseKit, name);
     });
 };
 
@@ -308,7 +312,7 @@ const updateStats = function () {
         "slowestRound", "mostConsecutiveNoCheck", "mostHealing",
         "mostInvertedUses", "mostBeerUses", "mostLensUses",
         "mostPhoneUses", "mostSawUses", "mostChainUses", "mostSmokeUses",
-        "mostDeadlyPillUses", "mostLandmineUses"
+        "mostDeadlyPillUses", "mostLandmineUses", "mostDefuseKitUses"
     ];
 
     higherIsBetter.forEach(key => {
@@ -397,13 +401,19 @@ const useItem = function (player, itemIndex) {
     if (item === undefined) return null;
     if (GAMESTATE.shotgun.chamber.length === 0) return null;
 
+    // The defuse kit only does something when a landmine is armed. With
+    // no mine to defuse it's inert — nothing spent, turn left intact.
+    if (item === "defuse kit" && !GAMESTATE.shotgun.landmineArmed) return null;
+
     const idx = nextShellIndex();
     const result = { player, item, effect: null, mineTriggered: false, mineDamage: 0 };
 
     // Any item use — including planting a second landmine — detonates
-    // an already-armed one first. The triggering item's own effect
-    // (below) still applies normally on top of the mine's damage.
-    if (GAMESTATE.shotgun.landmineArmed) {
+    // an already-armed one first, EXCEPT the defuse kit, which is the
+    // one item that safely disarms it instead of setting it off. The
+    // triggering item's own effect (below) still applies normally on
+    // top of the mine's damage.
+    if (GAMESTATE.shotgun.landmineArmed && item !== "defuse kit") {
         GAMESTATE.shotgun.landmineArmed = false;
 
         result.mineTriggered = true;
@@ -471,6 +481,12 @@ const useItem = function (player, itemIndex) {
         case "landmine":
             GAMESTATE.shotgun.landmineArmed = true;
             result.effect = { type: "landmine" };
+            break;
+
+        case "defuse kit":
+            // Guarded above — only reachable while a landmine is armed.
+            GAMESTATE.shotgun.landmineArmed = false;
+            result.effect = { type: "defuse" };
             break;
 
         default:
@@ -672,7 +688,8 @@ const ITEM_EMOJI = {
     "deadly pill": "💊",
     "chains": "⛓️",
     "inverter": "🔄",
-    "landmine": "💣"
+    "landmine": "💣",
+    "defuse kit": "🛡️"
 };
 
 const ITEM_LABELS = {
@@ -684,7 +701,8 @@ const ITEM_LABELS = {
     "deadly pill": "Deadly Pill",
     "chains": "Chains",
     "inverter": "Inverter",
-    "landmine": "Landmine"
+    "landmine": "Landmine",
+    "defuse kit": "Defuse Kit"
 };
 
 // Only items with ONE deterministic activation sound live here.
@@ -698,7 +716,8 @@ const ITEM_SFX_KEY = {
     "beer": "beer",
     "smoke": "smoke",
     "inverter": "inverter",
-    "landmine": "landminePlant"
+    "landmine": "landminePlant",
+    "defuse kit": "defuse"
 };
 
 // ---------- SFX ----------
@@ -732,6 +751,7 @@ const SFX = {
     inverter: ["Assets/SFX/inverter.mp3"],
     landminePlant: ["Assets/SFX/landmine-plant.mp3"],
     landmineTrigger: ["Assets/SFX/landmine-trigger.mp3"],
+    defuse: ["Assets/SFX/defuse.mp3"],
 
     // CHAINS
     chainApplied: ["Assets/SFX/chain-applied.mp3"],
@@ -904,6 +924,17 @@ const renderPlayerPanel = function (slot) {
         if (item) {
             slotEl.innerHTML = `<span class="item-icon">${ITEM_EMOJI[item]}</span>`;
             slotEl.title = ITEM_LABELS[item];
+
+            // The defuse kit can't be used unless a landmine is armed. It
+            // stays selectable while this player is choosing an item to
+            // discard in a swap, so a dead kit can still be traded away.
+            const isReplaceTarget = !!(replaceMode && replaceMode.player === slot);
+
+            if (item === "defuse kit" && !GAMESTATE.shotgun.landmineArmed && !isReplaceTarget) {
+                slotEl.classList.add("inert");
+                slotEl.disabled = true;
+                slotEl.title = "Defuse Kit — no landmine to defuse";
+            }
         }
         else {
             slotEl.classList.add("empty");
@@ -1004,6 +1035,11 @@ const handleEffectUI = function (effect) {
             );
             renderAll();
             break;
+
+        case "defuse":
+            showBanner("🛡️ Landmine defused — You can use items again.", 4000);
+            renderAll();
+            break;
     }
 };
 
@@ -1034,6 +1070,7 @@ const formatItemLog = function (slot, item, effect) {
         case "chain": return `⛓️ ${name} chains ${nameOf(effect.target)}.`;
         case "invert": return `🔄 ${name} inverts the next shell.`;
         case "landmine": return `💣 ${name} plants a landmine.`;
+        case "defuse": return `🛡️ ${name} defuses the landmine.`;
         default: return `${name} uses an item.`;
     }
 };
