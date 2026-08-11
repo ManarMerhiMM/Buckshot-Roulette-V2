@@ -8,8 +8,23 @@ let activeLabel = null;
 // ---------- SFX ----------
 // Each key holds an array of paths — playSfx picks one at random.
 const SFX = {
-    cleared: ["Assets/SFX/history-cleared.mp3"]
+    cleared: ["Assets/SFX/history-cleared.mp3"],
+    intro: ["Assets/SFX/stats_on_load.mp3"]
 };
+
+// Preload every SFX this page can play, once at load, so the first real play has no download delay.
+const sfxCache = {};
+
+Object.values(SFX).flat().forEach(src => {
+    if (sfxCache[src]) return;
+
+    const audio = new Audio();
+    audio.preload = "auto";
+    audio.src = src;
+    audio.load();
+
+    sfxCache[src] = audio;
+});
 
 const playSfx = function (key) {
     const variants = SFX[key];
@@ -18,7 +33,8 @@ const playSfx = function (key) {
     const src = getRandom(variants);
 
     try {
-        const audio = new Audio(src);
+        const base = sfxCache[src];
+        const audio = base ? base.cloneNode(true) : new Audio(src);
         audio.volume = 0.7;
         audio.play().catch(() => { /* autoplay blocked or file missing — ignore */ });
     }
@@ -263,7 +279,9 @@ const playStatsIntro = async function () {
         return;
 
     try {
-        await new Audio("./Assets/SFX/stats_on_load.mp3").play();
+        const introBase = sfxCache["Assets/SFX/stats_on_load.mp3"];
+        const intro = introBase ? introBase.cloneNode(true) : new Audio("Assets/SFX/stats_on_load.mp3");
+        await intro.play();
 
         setTimeout(() => {
             document.querySelectorAll(".player-name-special").forEach(player =>

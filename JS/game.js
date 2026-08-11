@@ -743,8 +743,8 @@ const SFX = {
 
     saw: ["Assets/SFX/saw.mp3"],
     smoke: ["Assets/SFX/smoke.mp3"],
-    lens: ["Assets/SFX/lens.mp3"],
-    phone: ["Assets/SFX/phone.mp3"],
+    lens: ["Assets/SFX/lens.mp3", "Assets/SFX/lens2.mp3", "Assets/SFX/lens3.mp3"],
+    phone: ["Assets/SFX/phone.mp3", "Assets/SFX/phone2.mp3"],
     beer: ["Assets/SFX/beer.mp3"],
     pillGood: ["Assets/SFX/pill-good.mp3", "Assets/SFX/pill-good2.mp3"],
     pillBad: ["Assets/SFX/pill-bad.mp3", "Assets/SFX/pill-bad2.mp3"],
@@ -769,6 +769,20 @@ const combinationText = function () {
     return `🔫 Loaded: ${live} LIVE 💥 · ${blank} BLANK 🎭`;
 };
 
+// Preload every SFX this page can play, once at load, so the first real play has no download delay.
+const sfxCache = {};
+
+Object.values(SFX).flat().forEach(src => {
+    if (sfxCache[src]) return;
+
+    const audio = new Audio();
+    audio.preload = "auto";
+    audio.src = src;
+    audio.load();
+
+    sfxCache[src] = audio;
+});
+
 const playSfx = function (key) {
     const variants = SFX[key];
     if (!variants || variants.length === 0) return;
@@ -776,7 +790,8 @@ const playSfx = function (key) {
     const src = getRandom(variants);
 
     try {
-        const audio = new Audio(src);
+        const base = sfxCache[src];
+        const audio = base ? base.cloneNode(true) : new Audio(src);
         audio.volume = 0.7;
         audio.play().catch(() => { /* autoplay blocked or file missing — ignore */ });
     }
