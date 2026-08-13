@@ -162,7 +162,7 @@ body {
     transform: translateY(0);
 }
 
-#achievementsSection .tagline{
+#achievementsSection .tagline {
     font-size: 0.9rem;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -196,7 +196,8 @@ body {
 
 /* Commons between player classes */
 .player-name-regular,
-.player-name-special {
+.player-name-special,
+.player-name-CPU {
     position: relative;
     overflow: hidden;
 
@@ -310,9 +311,143 @@ body {
     }
 }
 
+/* ---------- AI  ---------- */
+
+.player-name-CPU {
+    gap: 6px;
+
+    background-image: linear-gradient(112deg,
+            #5f7d84 0%,
+            #a9c0c4 10%,
+            #e8f1f2 18%,
+            #8fa8ad 25%,
+            #d5e3e5 34%,
+            #6d8b92 43%,
+            #b8cdd1 52%,
+            #f2f7f7 61%,
+            #819da3 69%,
+            #c7d9dc 78%,
+            #e9f2f3 86%,
+            #718e95 94%,
+            #a9c0c4 100%);
+
+    background-size: 300% 300%;
+
+    border: 1px solid #91adb3;
+
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.8) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.35) inset,
+        0 3px 8px rgba(0, 0, 0, 0.5),
+        0 0 8px rgba(80, 210, 230, 0.35),
+        0 0 18px rgba(70, 200, 220, 0.15);
+
+    animation:
+        ai-badge-shimmer 4s linear infinite,
+        ai-badge-pulse 2.8s ease-in-out infinite;
+}
+
+
+/* ---------- AI scanning beam ---------- */
+
+.player-name-CPU::after {
+    content: "";
+
+    position: absolute;
+    top: -20%;
+    left: -55%;
+
+    width: 18%;
+    height: 140%;
+
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(210, 250, 255, 0.45),
+            rgba(255, 255, 255, 0.95),
+            rgba(210, 250, 255, 0.45),
+            transparent);
+
+    transform: skewX(-18deg);
+
+    animation: ai-badge-scan 3.2s ease-in-out infinite;
+
+    pointer-events: none;
+}
+
+
+/* ---------- AI surface movement ---------- */
+
+@keyframes ai-badge-shimmer {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+
+/* ---------- AI breathing glow ---------- */
+
+@keyframes ai-badge-pulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 1px 0 rgba(255, 255, 255, 0.15) inset,
+            0 -1px 0 rgba(0, 0, 0, 0.7) inset,
+            0 3px 8px rgba(0, 0, 0, 0.5),
+            0 0 7px rgba(60, 210, 235, 0.2),
+            0 0 14px rgba(60, 210, 235, 0.08);
+    }
+
+    50% {
+        box-shadow:
+            0 1px 0 rgba(255, 255, 255, 0.18) inset,
+            0 -1px 0 rgba(0, 0, 0, 0.7) inset,
+            0 3px 8px rgba(0, 0, 0, 0.5),
+            0 0 12px rgba(60, 220, 245, 0.45),
+            0 0 24px rgba(60, 220, 245, 0.18);
+    }
+}
+
+
+/* ---------- AI scan ---------- */
+
+@keyframes ai-badge-scan {
+    0% {
+        left: -70%;
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 1;
+    }
+
+    55% {
+        left: 130%;
+        opacity: 1;
+    }
+
+    70% {
+        left: 130%;
+        opacity: 0;
+    }
+
+    100% {
+        left: 130%;
+        opacity: 0;
+    }
+}
+
 /* ---------- Icons (unchanged) ---------- */
 
-.player-name-regular-shot::before {
+.player-name-regular.shot::before {
     content: "";
     display: inline-block;
     width: 35px;
@@ -330,7 +465,7 @@ body {
     opacity: 1;
 }
 
-.player-name-special-shot::before {
+.player-name-special.shot::before {
     content: "";
     display: inline-block;
     width: 30px;
@@ -381,6 +516,11 @@ body {
         height: 22px;
     }
 
+    .player-name-CPU::before {
+        width: 22px;
+        height: 22px;
+    }
+
     .achievement-tooltip {
         font-size: 0.7rem;
     }
@@ -410,15 +550,13 @@ body {
         font-size: 0.75rem;
     }
 
-    .player-name-regular::before {
+    .player-name-regular::before,
+    .player-name-special::before,
+    .player-name-CPU::before {
         width: 20px;
         height: 20px;
     }
 
-    .player-name-special::before {
-        width: 20px;
-        height: 20px;
-    }
     .achievement-tooltip {
         font-size: 0.6rem;
     }

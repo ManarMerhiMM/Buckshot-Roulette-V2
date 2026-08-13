@@ -1,6 +1,7 @@
 import { readStats, resetStats, getRandom } from "./utility.js";
 
 const achievementsSection = document.getElementById("achievementsSection");
+const CPU_NAME = "CPU";
 
 let tooltipEl = null;
 let activeLabel = null;
@@ -50,11 +51,14 @@ const formatRecord = function (record) {
     }
 
     if (record.players.length === 1) {
+        if (record.players[0].toLowerCase() === CPU_NAME.toLowerCase())
+            return `${record.val} by <span class="player-name-special player-name-CPU">${record.players[0]}</span>`;
+
         return `${record.val} by <span class="player-name-special">${record.players[0]}</span>`
     }
 
     const players = record.players
-        .map(player => `<span class="player-name-regular">${player}</span>`)
+        .map(player => player.toLowerCase() === CPU_NAME.toLowerCase() ? `<span class="player-name-regular player-name-CPU">${player}</span>` : `<span class="player-name-regular">${player}</span>`)
         .join(", ");
 
     return `${record.val} by ${players}`;
@@ -285,21 +289,25 @@ const playStatsIntro = async function () {
 
         setTimeout(() => {
             document.querySelectorAll(".player-name-special").forEach(player =>
-                player.classList.add("player-name-special-shot")
+                player.classList.add("shot")
             );
             document.querySelectorAll(".player-name-regular").forEach(player =>
-                player.classList.add("player-name-regular-shot")
+                player.classList.add("shot")
             );
         }, 3200);
 
     } catch (err) {
         console.warn("Audio playback was blocked or failed:", err);
 
+        document.querySelectorAll(".player-name-CPU").forEach(player =>
+            player.classList.add("shot")
+        );
+
         document.querySelectorAll(".player-name-special").forEach(player =>
-            player.classList.add("player-name-special-shot")
+            player.classList.add("shot")
         );
         document.querySelectorAll(".player-name-regular").forEach(player =>
-            player.classList.add("player-name-regular-shot")
+            player.classList.add("shot")
         );
     }
 

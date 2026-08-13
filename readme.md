@@ -10,7 +10,7 @@ Each round loads a randomized chamber of live and blank shells. On your turn, sh
 
 ## ✨ Features
 
-- **1v1 local pass-and-play** — no accounts, no networking, no AI opponent, by design
+- **2 Gamemodes** — Either play a split-screen with another person or play vs the bot "CPU"
 - **10 items** — Saw, Magnifying Lens, Phone, Beer, Smoke, Deadly Pill, Chains, Inverter, Landmine, and Defuse Kit — each with its own effect, sound, and on-screen log
 - **Swap-on-full inventory** — picking up an item when your inventory is full lets you choose what to discard in its place
 - **Dynamic chamber generation** — chamber length (2–8 shells) and live/blank split are both randomized, with every length equally likely regardless of how many splits exist within it
@@ -55,8 +55,8 @@ Each round loads a randomized chamber of live and blank shells. On your turn, sh
 │
 └── Assets/
     ├── shotgun.svg              # shotgun picture used for homepage and gameplay
-    ├── achievement_normal.png   # silver achievement badge icon
-    ├── achievement_special.png  # gold achievement badge icon
+    ├── achievement_normal.png   # normal (multiple people) achievement badge icon
+    ├── achievement_special.png  # special (one person) achievement badge icon
     ├── Icons/                   # per-page favicons
     ├── SFX/                     # sound effects
     └── Screenshots/             # images used in this README
@@ -106,10 +106,12 @@ The concept is inspired by [**Buckshot Roulette**](https://store.steampowered.co
 ![Home](Assets/Screenshots/home.png)
 
 ### Match
-![Match in progress](Assets/Screenshots/game-board.png)
+![PvP](Assets/Screenshots/game-board.png)
+![PvE](Assets/Screenshots/game-boardAI.png)
 
 ### Settings
 ![Settings](Assets/Screenshots/settings.png)
+![Settings2](Assets/Screenshots/settings2.png)
 
 ### Match History
 ![Match History](Assets/Screenshots/history.png)

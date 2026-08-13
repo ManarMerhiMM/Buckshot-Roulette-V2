@@ -135,6 +135,7 @@ const DEFAULTSTATS = {
 };
 
 const DEFAULTSETTINGS = {
+    gameMode: "PvP",
     minHealth: 2,
     maxHealth: 4,
     minItems: 0,

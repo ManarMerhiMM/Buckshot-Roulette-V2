@@ -196,6 +196,20 @@ const initializeGameState = function () {
     GAMESTATE.players.p1.name = MATCH_SETTINGS.p1Name;
     GAMESTATE.players.p2.name = MATCH_SETTINGS.p2Name;
 
+    // In PvE the human is always p1 and the AI is always p2 — give the
+    // opponent a fixed identity: named "CPU", colored a neutral grey.
+    // Forced here (before applyPlayerColors reads the color) so it holds
+    // regardless of what's saved in settings.
+    if (MATCH_SETTINGS.gameMode === "PvE") {
+        MATCH_SETTINGS.p2Name = "CPU";
+        MATCH_SETTINGS.p2Color = "#8a8a8a";
+        GAMESTATE.players.p2.name = "CPU";
+    }
+
+    // The AI badge on the opponent's panel shows only in PvE.
+    const cpuBadge = $("cpuBadge");
+    if (cpuBadge) cpuBadge.hidden = !isPvE();
+
     GAMESTATE.players.p1.score = 0;
     GAMESTATE.players.p2.score = 0;
 
@@ -235,6 +249,8 @@ const startRound = function () {
 
     ROUND_TRACKER = structuredClone(DEFAULT_ROUND_TRACKER);
     ROUND_TRACKER.startTime = Date.now();
+
+    aiResetMemory();
 };
 
 const reloadShotgun = function () {
@@ -247,6 +263,8 @@ const reloadShotgun = function () {
 
     // health, inventorySpace, items, and turn all carry over untouched
     // — a planted (but not yet triggered) landmine also carries over
+
+    aiResetMemory();
 };
 
 const endRound = function (loser) {
@@ -1162,6 +1180,7 @@ const playStartupLoadSequence = function () {
             locked = false;
             updateLockUI();
             renderAll();
+            maybeAiTurn();
         });
     }, RELOAD_DELAY_MS);
 };
@@ -1171,6 +1190,9 @@ const playStartupLoadSequence = function () {
 const handleShoot = function (shooterSlot, targetSlot) {
     if (locked) return;
     if (GAMESTATE.players.turn !== shooterSlot) return;
+
+    // In PvE the human can't operate the AI's side — only the AI can.
+    if (isPvE() && shooterSlot === AI_SLOT && !aiActing) return;
 
     locked = true;
     updateLockUI();
@@ -1182,6 +1204,9 @@ const handleShoot = function (shooterSlot, targetSlot) {
         updateLockUI();
         return;
     }
+
+    // A shell just left the chamber and everyone saw whether it was live.
+    aiOnShellConsumed(result.isLive);
 
     trackShot(result);
     trackHealthChange();
@@ -1228,6 +1253,7 @@ const handleShoot = function (shooterSlot, targetSlot) {
                         locked = false;
                         updateLockUI();
                         renderAll();
+                        maybeAiTurn();
                     });
                 }, RELOAD_DELAY_MS);
 
@@ -1237,6 +1263,7 @@ const handleShoot = function (shooterSlot, targetSlot) {
             locked = false;
             updateLockUI();
             renderAll();
+            maybeAiTurn();
         }, SHOT_ANIM_MS);
     }, SHOT_RESULT_DELAY_MS);
 };
@@ -1273,11 +1300,18 @@ const handleUseItem = function (slot, idx) {
     if (locked) return;
     if (GAMESTATE.players.turn !== slot) return;
 
+    // In PvE the human can't use the AI's items — only the AI can.
+    if (isPvE() && slot === AI_SLOT && !aiActing) return;
+
     const item = GAMESTATE.players[slot].items[idx];
     if (!item) return;
 
     const result = useItem(slot, idx);
     if (!result) return;
+
+    // Update the AI's fair belief model from this item's public effect
+    // (a revealed shell, a racked shell, or an inverted next shell).
+    aiObserveItem(result.effect);
 
     locked = true;
     updateLockUI();
@@ -1337,6 +1371,7 @@ const handleUseItem = function (slot, idx) {
                         locked = false;
                         updateLockUI();
                         renderAll();
+                        maybeAiTurn();
                     }
                 );
             }, RELOAD_DELAY_MS);
@@ -1347,6 +1382,7 @@ const handleUseItem = function (slot, idx) {
         locked = false;
         updateLockUI();
         renderAll();
+        maybeAiTurn();
     };
 
     if (result.mineTriggered) {
@@ -1362,6 +1398,9 @@ const handleUseItem = function (slot, idx) {
 
 const handleTakeItem = function (slot, tableIndex) {
     if (locked || replaceMode) return;
+
+    // In PvE the human can't touch the AI's table — only the AI can.
+    if (isPvE() && slot === AI_SLOT && !aiActing) return;
 
     const p = GAMESTATE.players[slot];
     const item = p.table[tableIndex];
@@ -1389,6 +1428,9 @@ const handleTakeItem = function (slot, tableIndex) {
 
 const resolveReplace = function (slot, invIndex) {
     if (!replaceMode) return;
+
+    // In PvE the human can't resolve the AI's swap — only the AI can.
+    if (isPvE() && slot === AI_SLOT && !aiActing) return;
 
     const res = takeItem(slot, replaceMode.tableIndex, invIndex);
 
@@ -1508,6 +1550,457 @@ const setupDelegation = function () {
         }
     });
 };
+
+// ============================================================
+//  PvE — "THE DEALER" (a fair AI opponent)
+//
+//  The AI plays ONLY on information a sharp human at the table would have
+//
+// ============================================================
+
+const AI_SLOT = "p2";               // human is always p1, AI always p2
+const AI_ACTION_DELAY_MS = 1500;     // pause between the AI's individual actions
+
+const isPvE = function () {
+    return !!MATCH_SETTINGS && MATCH_SETTINGS.gameMode === "PvE";
+};
+
+let aiActing = false;    // true only while the AI itself is driving a handler
+let aiThinking = false;  // a think-tick is already scheduled
+let aiArmedMine = false; // the current mine was planted by the AI
+
+// ---------- Fair belief model of the chamber ----------
+//
+// known[]      — firing order, index 0 = the shell that fires next.
+//                true / false = a shell's CURRENT (physical) value if known,
+//                null/undefined = unknown.
+// inverted[]   — parallel to known[]: inverted[i] is true when shell i has
+//                been flipped an odd number of times from the kind it was
+//                LOADED with. Only the next shell can ever be inverted, but
+//                tracking it per-shell keeps the bit attached to that shell
+//                even after it's revealed (so consumption still knows its
+//                loaded kind) and shifts cleanly as shells leave.
+// live / blank — believed remaining counts, always in LOADED terms: every
+//                remaining shell is tallied by the kind it was loaded with,
+//                never its post-flip value. Seeded from the public load
+//                announcement, then kept in step with observed events. An
+//                inversion never moves these — it only changes a shell's
+//                physical value (known[]) and its inverted[] bit.
+const AI_MEMORY = { live: 0, blank: 0, known: [], inverted: [] };
+
+// Counts only — never the order. This is exactly the "X LIVE · Y BLANK"
+// the game shows BOTH players whenever the chamber is loaded.
+const fairCounts = function () {
+    const chamber = GAMESTATE.shotgun.chamber;
+    let live = 0;
+    for (let i = 0; i < chamber.length; i++) {
+        if (chamber[i]) live++;
+    }
+    return { live, blank: chamber.length - live, total: chamber.length };
+};
+
+const aiResetMemory = function () {
+    const c = fairCounts();          // counts are announced publicly on load
+    AI_MEMORY.live = c.live;
+    AI_MEMORY.blank = c.blank;
+    AI_MEMORY.known = [];
+    AI_MEMORY.inverted = [];
+};
+
+const aiTrimKnown = function () {
+    const len = GAMESTATE.shotgun.chamber.length;
+    if (AI_MEMORY.known.length > len) AI_MEMORY.known.length = len;
+    if (AI_MEMORY.inverted.length > len) AI_MEMORY.inverted.length = len;
+};
+
+// A shell just left the chamber (fired or racked); its physical value was
+// visible. The counts are in LOADED terms, so remove this shell by the kind
+// it was loaded with — undo any flip before subtracting.
+const aiOnShellConsumed = function (wasLive) {
+    const k = AI_MEMORY.known.length ? AI_MEMORY.known[0] : null;
+    const flipped = !!AI_MEMORY.inverted[0];
+
+    // Its physical value: what we knew, or failing that what actually fired.
+    const physicalLive = (k === true || k === false) ? k : wasLive;
+    // Its loaded kind: the physical value un-flipped.
+    const loadedLive = flipped ? !physicalLive : physicalLive;
+
+    if (loadedLive) AI_MEMORY.live = Math.max(0, AI_MEMORY.live - 1);
+    else AI_MEMORY.blank = Math.max(0, AI_MEMORY.blank - 1);
+
+    if (AI_MEMORY.known.length) AI_MEMORY.known.shift();
+    if (AI_MEMORY.inverted.length) AI_MEMORY.inverted.shift();
+    aiTrimKnown();
+};
+
+// A lens (s = 1) or phone (s = shots away) revealed a shell's CURRENT value.
+// This never touches inverted[]: a revealed-then-inverted shell keeps its
+// flip bit, so consumption can still recover its loaded kind.
+const aiOnReveal = function (shotsAway, isLive) {
+    const idx = Math.max(0, shotsAway - 1);
+    AI_MEMORY.known[idx] = isLive;   // physical value
+    aiTrimKnown();
+};
+
+// The inverter flips the next shell (still in the chamber). Loaded counts
+// don't move — only this shell's physical value and its flip bit do. Works
+// the same whether or not the shell's value is currently known.
+const aiOnInvert = function () {
+    AI_MEMORY.inverted[0] = !AI_MEMORY.inverted[0];
+
+    const k = AI_MEMORY.known.length ? AI_MEMORY.known[0] : null;
+    if (k === true) AI_MEMORY.known[0] = false;
+    else if (k === false) AI_MEMORY.known[0] = true;
+};
+
+// Route an item's public effect into the belief model (BOTH players).
+const aiObserveItem = function (effect) {
+    if (!effect) return;
+
+    if (effect.type === "reveal") {
+        const s = ("shotsAway" in effect) ? effect.shotsAway : 1;  // lens = next shell
+        aiOnReveal(s, effect.isLive);
+    }
+    else if (effect.type === "rack") {
+        aiOnShellConsumed(effect.isLive);
+    }
+    else if (effect.type === "invert") {
+        aiOnInvert();
+    }
+};
+
+// Probability the NEXT shell is (physically) live, from fair belief only.
+const aiPLiveNext = function () {
+    const known0 = AI_MEMORY.known.length ? AI_MEMORY.known[0] : null;
+    if (known0 === true) return 1;   // known[] holds physical values already
+    if (known0 === false) return 0;
+
+    // Counts are in LOADED terms, so subtract the known shells by their loaded
+    // kind (un-flipping any that were inverted) to leave the unknown pool.
+    let knownLoadedLive = 0, knownCount = 0;
+    for (let i = 0; i < AI_MEMORY.known.length; i++) {
+        const v = AI_MEMORY.known[i];
+        if (v !== true && v !== false) continue;
+        knownCount++;
+        if (AI_MEMORY.inverted[i] ? !v : v) knownLoadedLive++;
+    }
+
+    const poolLive = Math.max(0, AI_MEMORY.live - knownLoadedLive);
+    const poolTotal = Math.max(0, (AI_MEMORY.live + AI_MEMORY.blank) - knownCount);
+
+    // base = P(the next shell was LOADED live). If it's been flipped, its
+    // physical live chance is the complement.
+    let base;
+    if (poolTotal <= 0) {
+        const total = AI_MEMORY.live + AI_MEMORY.blank;
+        base = total > 0 ? AI_MEMORY.live / total : 0;
+    }
+    else {
+        base = poolLive / poolTotal;
+    }
+
+    const pLive = AI_MEMORY.inverted[0] ? (1 - base) : base;
+
+    return Math.max(0, Math.min(1, pLive));
+};
+
+// ---------- Item valuation (for stocking up from the table) ----------
+
+const aiItemValue = function (item) {
+    switch (item) {
+        case "smoke": return 9;
+        case "magnifying lens": return 8;
+        case "chains": return GAMESTATE.shotgun.chamber.length <= 4 ? 9 : 6;
+        case "saw": return 7;
+        case "inverter": return 7;
+        case "beer": return 5;
+        case "phone": return GAMESTATE.shotgun.chamber.length <= 3 ? 8 : GAMESTATE.shotgun.chamber.length <= 5 ? 6 : 4;
+        case "landmine": return GAMESTATE.players.p1.items.includes("defuse kit") || GAMESTATE.players.p1.table.includes("defuse kit") ? 3 : 7;
+        case "defuse kit": return GAMESTATE.shotgun.landmineArmed || GAMESTATE.players.p1.items.includes("landmine") || GAMESTATE.players.p1.table.includes("landmine") ? 9 : 5;
+        case "deadly pill": return 3;
+        default: return 1;
+    }
+};
+
+// Index of an item in the AI's inventory, or -1.
+const aiInvHas = function (item) {
+    return GAMESTATE.players[AI_SLOT].items.indexOf(item);
+};
+
+// "Studied randomness" — a coin-flip helper used to make some non-critical
+// plays occasional rather than perfectly predictable. Never gates survival,
+// lethal finishes, or safe known-blank self-shots.
+const aiChance = function (probability) {
+    return Math.random() < probability;
+};
+
+// How dangerous an item is in the OPPONENT's hands — used to decide whether
+// a landmine is worth planting to deny them their items. Static (independent
+// of the AI's own state) since it rates the opponent's toolkit, not ours.
+const aiItemThreat = function (item) {
+    switch (item) {
+        case "magnifying lens": return 8;
+        case "chains": return 7;
+        case "saw": return GAMESTATE.players.p2.health <= 2 ? 8 : 6;
+        case "phone": return GAMESTATE.shotgun.chamber.length <= 4 ? 6 : 4;
+        case "landmine": return 5;
+        case "defuse kit": return 5;
+        case "inverter": return 4;
+        case "smoke": return GAMESTATE.players.p1.health <= 3 ? 7 : 4;
+        case "beer": return 3;
+        case "deadly pill": return 2;
+        default: return 3;
+    }
+};
+
+// ---------- Decisions ----------
+
+// Pull the best worthwhile item off the table. Grabs into a free slot,
+// or swaps out a clearly weaker held item when the inventory is full.
+const aiChooseTake = function () {
+    const me = GAMESTATE.players[AI_SLOT];
+    const space = GAMESTATE.players.inventorySpace;
+
+    if (space <= 0 || me.table.length === 0) return null;
+
+    let bestIdx = -1, bestVal = -Infinity;
+    me.table.forEach((it, i) => {
+        const v = aiItemValue(it);
+        if (v > bestVal) { bestVal = v; bestIdx = i; }
+    });
+    if (bestIdx === -1) return null;
+
+    if (me.items.length < space) {
+        // With a free slot, grab anything worth holding — pills and defuse
+        // kits included (a defuse kit can save a future round after a reload).
+        if (bestVal >= 2) return { kind: "take", tableIndex: bestIdx };
+        return null;
+    }
+
+    // Inventory full — only swap when the new item clearly beats our worst.
+    let worstIdx = -1, worstVal = Infinity;
+    me.items.forEach((it, i) => {
+        const v = aiItemValue(it);
+        if (v < worstVal) { worstVal = v; worstIdx = i; }
+    });
+
+    if (worstIdx !== -1 && bestVal > worstVal + 1) {
+        return { kind: "take", tableIndex: bestIdx, replaceIndex: worstIdx };
+    }
+    return null;
+};
+
+// Where to point the gun, given the current (fair) odds.
+const aiDecideShoot = function () {
+    const me = GAMESTATE.players[AI_SLOT];
+    const opp = getOpponent(AI_SLOT);
+    const p = aiPLiveNext();
+
+    if (p <= 0) return { kind: "shoot", target: AI_SLOT };   // known blank → free self-shot (safe even at 1 HP)
+    if (p >= 1) return { kind: "shoot", target: opp };        // known live → hit opponent
+    if (me.health === 1 && p > 0) return { kind: "shoot", target: opp }; // never gamble self at 1 HP
+
+    // Only shoot self when a blank is the clear favorite — at least ~75% blank
+    // (P(live) ≤ 0.25). Otherwise it isn't worth the risk. A hair of jitter on
+    // the boundary keeps it from feeling robotic, but only with an HP cushion
+    // so it never gambles a self-shot recklessly.
+    let selfMax = 0.25;
+    if (me.health >= 3) selfMax += (Math.random() - 0.5) * 0.06;  // ±0.03
+
+    if (p <= selfMax) return { kind: "shoot", target: AI_SLOT };
+    return { kind: "shoot", target: opp };
+};
+
+// The best single ITEM to use this tick (mine handling is layered on
+// top separately). Returns a { kind: "use", idx } action or null.
+const aiChooseItemUse = function () {
+    const me = GAMESTATE.players[AI_SLOT];
+    const oppSlot = getOpponent(AI_SLOT);
+    const opp = GAMESTATE.players[oppSlot];
+    const p = aiPLiveNext();
+    const known0 = AI_MEMORY.known.length ? AI_MEMORY.known[0] : null;
+    const unknownNext = known0 === null || known0 === undefined;
+    const sawed = GAMESTATE.shotgun.sawedOff;
+
+    const idxOf = (it) => aiInvHas(it);
+    const holds = (it) => idxOf(it) !== -1;
+    const amountOf = (it) => me.items.filter(x => x === it).length + me.table.filter(x => x === it).length;
+
+    const dmg = sawed ? 2 : 1;
+    const likelyLive = p >= 0.75;                 // "at least 75% live"
+    const moderateLive = p >= 0.5;
+    const lowHP = me.health <= 2;
+    const liveWouldKill = opp.health <= dmg;                          // a live shot as-is finishes them
+    const canSawLethal = !sawed && holds("saw") && opp.health > dmg && opp.health <= 2; // saw makes it lethal
+    const goingForKill = likelyLive && (liveWouldKill || canSawLethal);
+
+    // 1. SURVIVE — heal whenever we can (no HP cap, so it's always upside).
+    if (holds("smoke")) {
+        return { kind: "use", idx: idxOf("smoke") };
+    }
+
+    // 2. FINISH — a very-likely live shot that lands the kill. Saw first if
+    //    that's what makes it lethal; otherwise the shoot phase fires it.
+    //    Chasing the win beats playing defense.
+    if (goingForKill && canSawLethal) {
+        return { kind: "use", idx: idxOf("saw") };
+    }
+
+    // 3. DEFEND (low HP, not chasing a kill) — don't feed the opponent live
+    //    shells. Rack a likely-live next away with beer, or flip it to a blank
+    //    and self-shoot to keep the turn rather than gamble damage.
+    if (lowHP && !goingForKill) {
+        if (holds("beer") && (known0 === true || moderateLive)) {
+            return { kind: "use", idx: idxOf("beer") };
+        }
+        if (holds("inverter") && (known0 === true || (me.health >= 2 && likelyLive))) {
+            return { kind: "use", idx: idxOf("inverter") };
+            // next tick: next is (likely) blank → self-shoot preserves the turn
+        }
+    }
+
+    // 4. PRESS — with HP to spare, saw a ≥75%-live shot for double damage.
+    if (likelyLive && !sawed && holds("saw") && opp.health > 1) {
+        return { kind: "use", idx: idxOf("saw") };
+    }
+
+    // More than 1 saw owned and moderate chance of live ≥ 0.5, use a saw for potential double damage
+    if (moderateLive && amountOf("saw") > 1) {
+        return { kind: "use", idx: idxOf("saw") };
+    }
+
+    // 5. CHECK — when the next shell is a genuine gamble, buy certainty.
+    if (unknownNext && p > 0 && p < 1) {
+        if (holds("magnifying lens") && ((p >= 0.34 && p <= 0.66) || me.health <= 2)) {
+            return { kind: "use", idx: idxOf("magnifying lens") };
+        }
+        if (!holds("magnifying lens") && holds("phone") &&
+            (me.health <= 2 || (p >= 0.34 && p <= 0.66))) {
+            return { kind: "use", idx: idxOf("phone") };
+        }
+    }
+
+    // 6. MANUFACTURE DAMAGE — flip a KNOWN blank next into a live hit.
+    //    Occasionally skipped so the AI isn't perfectly predictable.
+    if (known0 === false && holds("inverter") && opp.health <= 3 && aiChance(0.85)) {
+        return { kind: "use", idx: idxOf("inverter") };
+        // next tick: next is now known live → step 2/4 saws, then shoot
+    }
+
+    // 7. DENY — chain aggressively. An extra turn while live shells remain is
+    //    strong on offense or defense; lean into it most of the time.
+    if (holds("chains") && !opp.chained && AI_MEMORY.live >= 1 && aiChance(0.95)) {
+        return { kind: "use", idx: idxOf("chains") };
+    }
+
+    // 8. GAMBLE — a pill only with a real cushion (≥4 HP), so even a bad roll
+    //    (-1) doesn't leave us one sawed shot from death. +2 is pure upside
+    //    since healing has no cap.
+    if (holds("deadly pill") && me.health >= 4 && aiChance(0.65)) {
+        return { kind: "use", idx: idxOf("deadly pill") };
+    }
+
+    // 9. TRAP (last) — everything else is spent; plant a mine to deny the
+    //    opponent their items, but only if those items are worth denying.
+    //    Their HP is irrelevant — this is about blocking item use.
+    if (holds("landmine") && !GAMESTATE.shotgun.landmineArmed) {
+        const oppKit = [...opp.items, ...opp.table];
+        const oppThreat = oppKit.reduce((sum, item) => sum + aiItemThreat(item), 0);
+        if (oppThreat >= 16) {
+            aiArmedMine = true;
+            return { kind: "use", idx: idxOf("landmine") };
+        }
+    }
+
+    return null;
+};
+
+// One whole decision: stock up, handle any armed mine, use an item, or shoot.
+const aiChooseAction = function () {
+    const mineArmed = GAMESTATE.shotgun.landmineArmed;
+    if (!mineArmed) aiArmedMine = false;
+
+    // Stock the inventory from the table first.
+    const take = aiChooseTake();
+    if (take) return take;
+
+    const wantItem = aiChooseItemUse();
+
+    if (mineArmed) {
+        // Our own trap — don't disturb it, just pass the turn along.
+        if (aiArmedMine) return aiDecideShoot();
+        // Nothing worth using anyway — leave the mine for whoever's next.
+        if (!wantItem) return aiDecideShoot();
+
+        const defuseIdx = aiInvHas("defuse kit");
+        if (defuseIdx !== -1) return { kind: "use", idx: defuseIdx }; // clear it, act next tick
+
+        // No defuse kit: using the item costs 2 HP — only if we can spare it.
+        if (GAMESTATE.players[AI_SLOT].health > 2) return wantItem;
+        return aiDecideShoot();
+    }
+
+    return wantItem || aiDecideShoot();
+};
+
+// ---------- Scheduler ----------
+
+const aiAct = function () {
+    if (!isPvE()) return;
+    if (locked) return;
+    if (GAMESTATE.players.turn !== AI_SLOT) return;
+    if (GAMESTATE.shotgun.chamber.length === 0) return;
+    if (!$("roundOverOverlay").hidden || !$("matchOverOverlay").hidden) return;
+
+    const action = aiChooseAction();
+    if (!action) return;
+
+    aiActing = true;
+    try {
+        if (action.kind === "take") {
+            handleTakeItem(AI_SLOT, action.tableIndex);
+
+            if (replaceMode && replaceMode.player === AI_SLOT) {
+                if (action.replaceIndex != null) {
+                    resolveReplace(AI_SLOT, action.replaceIndex);
+                }
+                else {
+                    // Decided not to swap after all — back out of replace mode.
+                    replaceMode = null;
+                    $("replaceBanner").hidden = true;
+                    renderAll();
+                }
+            }
+        }
+        else if (action.kind === "use") {
+            handleUseItem(AI_SLOT, action.idx);
+        }
+        else {
+            handleShoot(AI_SLOT, action.target);
+        }
+    }
+    finally {
+        aiActing = false;
+    }
+
+    // Taking an item (or a no-op) doesn't lock the board — keep the turn moving.
+    if (!locked) maybeAiTurn();
+};
+
+function maybeAiTurn() {
+    if (!isPvE()) return;
+    if (aiThinking) return;
+    if (locked) return;
+    if (GAMESTATE.players.turn !== AI_SLOT) return;
+    if (GAMESTATE.shotgun.chamber.length === 0) return;
+    if (!$("roundOverOverlay").hidden || !$("matchOverOverlay").hidden) return;
+
+    aiThinking = true;
+    setTimeout(() => {
+        aiThinking = false;
+        aiAct();
+    }, AI_ACTION_DELAY_MS);
+}
 
 // ---------- Init ----------
 

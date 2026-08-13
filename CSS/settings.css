@@ -109,7 +109,8 @@ body {
     text-transform: uppercase;
 }
 
-.setting-row input[type="number"], .setting-row input[type="text"]  {
+.setting-row input[type="number"],
+.setting-row input[type="text"] {
     width: 90px;
     padding: 8px;
 
@@ -123,7 +124,28 @@ body {
     text-align: center;
 }
 
-.setting-row input[type="number"]:focus, .setting-row input[type="text"]:focus {
+.setting-row input[type="number"]:focus,
+.setting-row input[type="text"]:focus {
+    outline: none;
+    border-color: var(--brass);
+}
+
+.setting-row select {
+    width: 240px;
+    max-width: 60%;
+    padding: 8px;
+
+    background: #0d0b08;
+
+    border: 1px solid #2a2318;
+
+    color: var(--bone);
+
+    font-family: 'Space Mono', monospace;
+    cursor: pointer;
+}
+
+.setting-row select:focus {
     outline: none;
     border-color: var(--brass);
 }
@@ -206,6 +228,11 @@ body {
     font-family: 'Space Mono', monospace;
 }
 
+:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
 @media (max-width: 600px) {
 
     body {
@@ -223,6 +250,11 @@ body {
 
     .setting-row input {
         width: 100%;
+    }
+
+    .setting-row select {
+        width: 100%;
+        max-width: none;
     }
 
     .settings-actions {
