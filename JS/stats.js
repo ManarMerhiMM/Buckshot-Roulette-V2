@@ -77,11 +77,14 @@ const formatTimeRecord = function (record) {
         : `${seconds}s`;
 
     if (record.players.length === 1) {
+        if (record.players[0].toLowerCase() === CPU_NAME.toLowerCase())
+            return `${time} by <span class="player-name-special player-name-CPU">${record.players[0]}</span>`;
+
         return `${time} by <span class="player-name-special">${record.players[0]}</span>`;
     }
 
     const players = record.players
-        .map(player => `<span class="player-name-regular">${player}</span>`)
+        .map(player => player.toLowerCase() === CPU_NAME.toLowerCase() ? `<span class="player-name-regular player-name-CPU">${player}</span>` : `<span class="player-name-regular">${player}</span>`)
         .join(", ");
 
     return `${time} by ${players}`;
